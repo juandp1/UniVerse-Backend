@@ -5,7 +5,7 @@
 Clone the repository:
 
 ```bash
-git clone https://github.com/CarlosSandoval-03/UniVerse-Backend && cd UniVerse-Backend
+git clone https://github.com/El-Clan-Del-Bug/UniVerse-Backend.git && cd UniVerse-Backend
 ```
 
 Create and activate a virtual environment:
