@@ -28,7 +28,7 @@ source .venv/bin/activate
 Before to execute the command [enable execution of scripts in powershell](https://superuser.com/questions/106360/how-to-enable-execution-of-powershell-scripts)
 
 ```bash
-.venv/Scripts/Activate.ps1
+.\venv\Scripts\Activate.ps1
 ```
 
 ### Install requirements
