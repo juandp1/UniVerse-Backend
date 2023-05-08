@@ -2,6 +2,11 @@
 
 ## Getting started
 
+Dependencies:
+
+1. Python 3.10 or higher
+2. MySQL 8.0 or higher
+
 ### Clone the repository
 
 ```bash
@@ -35,6 +40,24 @@ Before to execute the command [enable execution of scripts in powershell](https:
 
 ```bash
 pip install -r requirements.txt
+```
+
+### Configure Enviroment Variables
+
+```bash
+# Server
+HOST=127.0.0.1
+PORT=8080
+ENV=development
+SECRET_KEY=
+# MySQL
+MYSQL_USER=root
+MYSQL_PASSWORD=1201
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
+MYSQL_DB_NAME=generic-database
+# JWT
+JWT_SECRET_KEY=
 ```
 
 ### Run the project
