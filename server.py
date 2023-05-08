@@ -1,6 +1,4 @@
-from start.app import app
-from config.server import server_config
+from config.server_conf import run_server
 
 if __name__ == "__main__":
-    app.config.from_object(server_config["development"])
-    app.run()
+    run_server()

@@ -7,6 +7,8 @@ Dependencies:
 1. Python 3.10 or higher
 2. MySQL 8.0 or higher
 
+---
+
 ### Clone the repository
 
 ```bash
@@ -22,11 +24,15 @@ python3 -m venv .venv
 
 ### Activate virtual env
 
+---
+
 #### Linux - MacOs
 
 ```bash
 source .venv/bin/activate
 ```
+
+---
 
 #### Windows Powershell
 
@@ -36,20 +42,25 @@ Before to execute the command [enable execution of scripts in powershell](https:
 .\venv\Scripts\Activate.ps1
 ```
 
+---
+
 ### Install requirements
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Configure Enviroment Variables
+### Configure Environment Variables
+
+Create a file called `.env` in the root of the project and add the following variables:
 
 ```bash
+## EXAMPLE OF .env FILE ##
 # Server
 HOST=127.0.0.1
 PORT=8080
 ENV=development
-SECRET_KEY=
+SECRET_KEY="secure-key"
 # MySQL
 MYSQL_USER=root
 MYSQL_PASSWORD=1201
@@ -57,7 +68,7 @@ MYSQL_HOST=127.0.0.1
 MYSQL_PORT=3306
 MYSQL_DB_NAME=generic-database
 # JWT
-JWT_SECRET_KEY=
+JWT_SECRET_KEY="secure-key"
 ```
 
 ### Run the project
