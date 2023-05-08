@@ -22,9 +22,7 @@ api = Api(app)
 # Configuring the Flask-SQLAlchemy
 db = SQLAlchemy()
 
-
-@app.before_first_request
-def create_tables():
+with app.app_context():
     db.init_app(app)
     db.create_all()
 
