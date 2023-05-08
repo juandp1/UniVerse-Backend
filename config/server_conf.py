@@ -1,9 +1,13 @@
 from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
-from flask_sqlalchemy import SQLAlchemy
 
 from config.server_variables import *
+
+# Importing the database object and models
+from config.database_conf import db
+from models.user import UserModel
+from models.administrator import AdministratorModel
 
 # Configuring the Flask app
 app = Flask(__name__)
@@ -19,9 +23,7 @@ app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
 jwt = JWTManager(app)
 api = Api(app)
 
-# Configuring the Flask-SQLAlchemy
-db = SQLAlchemy()
-
+# Create the database tables
 with app.app_context():
     db.init_app(app)
     db.create_all()
