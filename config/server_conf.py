@@ -8,6 +8,8 @@ from config.server_variables import *
 from config.database_conf import db
 from models.user import UserModel
 from models.administrator import AdministratorModel
+from models.label import LabelModel
+from models.user_follows_label import User_FollowsLabelModel
 
 # Configuring the Flask app
 app = Flask(__name__)
