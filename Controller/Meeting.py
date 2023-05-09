@@ -3,6 +3,7 @@ from config.server_conf import db
 from flask_sqlalchemy import SQLAlchemy as sq
 from datetime import datetime
 
+#Tablas provisionals miestras se tiene las tablas originales en otros controladores
 class Community(db.model):
     id_community = db.Column(db.Integer, nullable = False, primary_key = True)
     name =db.Column(db.String(60), nullable = False)
@@ -11,6 +12,7 @@ class User(db.model):
     id_user = db.Column(db.Integer, nullable = False, primary_key = True)
     name =db.Column(db.String(60), nullable = False)
 
+#Controlador Meeting
 class Meeting(db.model):
     id_meeting = db.Column(db.Integer, nullable = False, primary_key = True)
     name = db.Column(db.String(60), nullable = False)
