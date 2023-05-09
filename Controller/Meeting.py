@@ -18,7 +18,7 @@ class Meeting(db.model):
     name = db.Column(db.String(60), nullable = False)
     description = db.Column(db.String(120))
     place = db.Column(db.String(100), nullable = False)
-    date = db.Column(db.date, nullable = False)
+    date = db.Column(db.datetime, nullable = False)
     created_at = db.Column(db.datetime)
     updated_at = db.Column(db.datetime)
     id_community = db.Column(db.Integer, sq.ForeignKey(Community.id_community), nullable = False)
