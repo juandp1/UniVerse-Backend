@@ -4,12 +4,9 @@ from flask_jwt_extended import JWTManager
 
 from config.server_variables import *
 
-# Importing the database object and models
+# Import models
 from config.database_conf import db
-from models.user import UserModel
-from models.administrator import AdministratorModel
-from models.label import LabelModel
-from models.user_follows_label import User_FollowsLabelModel
+from config.load_models import *
 
 # Configuring the Flask app
 app = Flask(__name__)
