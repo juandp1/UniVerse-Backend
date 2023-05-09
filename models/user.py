@@ -26,8 +26,10 @@ class UserModel(db.Model):
         "AdministratorModel", uselist=False, back_populates="user"
     )
 
-    user_follows_label = db.relationship(
-        "User_FollowsLabelModel", back_populates="user"
+    user_follows_label = db.relationship("UserFollowsLabelModel", back_populates="user")
+
+    user_belongs_to_community = db.relationship(
+        "UserBelongsToCommunityModel", back_populates="user"
     )
 
     # Methods

@@ -2,15 +2,18 @@ import datetime
 from config.server_conf import db
 
 
-class UserFollowsLabelModel(db.Model):
-    __tablename__ = "User_follows_label"
+class LabelHasCommunity(db.Model):
+    __tablename__ = "Label_has_Community"
 
     # Attributes
     user_id = db.Column(
-        "User_id_user", db.Integer, db.ForeignKey("User.id_user"), primary_key=True
-    )
-    label_id = db.Column(
         "Label_id_label", db.Integer, db.ForeignKey("Label.id_label"), primary_key=True
+    )
+    community_id = db.Column(
+        "Community_id_community",
+        db.Integer,
+        db.ForeignKey("Community.id_community"),
+        primary_key=True,
     )
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
     created_at = db.Column(
@@ -24,10 +27,12 @@ class UserFollowsLabelModel(db.Model):
     )
 
     # Relationships
-    user = db.relationship("UserModel", back_populates="user_follows_label")
-    label = db.relationship("LabelModel", back_populates="user_follows_label")
+    label = db.relationship("LabelModel", back_populates="label_has_community")
+    community = db.relationship(
+        "CommunityModel", back_populates="user_belongs_to_community"
+    )
 
     # Methods
-    def __init__(self, user_id, label_id):
+    def __init__(self, user_id, community_id):
         self.user_id = user_id
-        self.label_id = label_id
+        self.community_id = community_id

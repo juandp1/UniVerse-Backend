@@ -2,12 +2,12 @@ import datetime
 from config.server_conf import db
 
 
-class LabelModel(db.Model):
-    __tablename__ = "Label"
+class TopicModel(db.Model):
+    __tablename__ = "Topic"
 
     # Attributes
-    id = db.Column("id_label", db.Integer, primary_key=True)
-    name = db.Column("name", db.String(60), nullable=False)
+    id = db.Column("id_topic", db.Integer, primary_key=True)
+    name = db.Column("name", db.String(45), nullable=False)
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
     created_at = db.Column(
         "created_at", db.DateTime, nullable=False, default=datetime.datetime.utcnow
@@ -20,10 +20,13 @@ class LabelModel(db.Model):
     )
 
     # Relationships
-    user_follows_label = db.relationship(
-        "UserFollowsLabelModel", back_populates="label"
+    administrator_id = db.Column(
+        "Administrator_User_id_user",
+        db.Integer,
+        db.ForeignKey("Administrator.User_id_user"),
     )
 
     # Methods
-    def __init__(self, name):
+    def __init__(self, name, administrator_id):
         self.name = name
+        self.administrator_id = administrator_id
