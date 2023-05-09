@@ -2,7 +2,7 @@ import datetime
 from config.server_conf import db
 
 
-class AdministratorManageCommunity(db.Model):
+class AdministratorManageCommunityModel(db.Model):
     __tablename__ = "Administrator_manage_Community"
 
     # Attributes
@@ -27,14 +27,6 @@ class AdministratorManageCommunity(db.Model):
         db.DateTime,
         nullable=False,
         default=datetime.datetime.utcnow,
-    )
-
-    # Relationships
-    user = db.relationship(
-        "AdministratorModel", back_populates="administrator_manage_community"
-    )
-    community = db.relationship(
-        "CommunityModel", back_populates="user_belongs_to_community"
     )
 
     # Methods

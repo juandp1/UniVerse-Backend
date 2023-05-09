@@ -20,6 +20,9 @@ class LabelModel(db.Model):
     )
 
     # Relationships
+    label_has_community = db.relationship(
+        "LabelHasCommunityModel", back_populates="label"
+    )
     user_follows_label = db.relationship(
         "UserFollowsLabelModel", back_populates="label"
     )

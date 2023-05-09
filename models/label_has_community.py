@@ -2,11 +2,11 @@ import datetime
 from config.server_conf import db
 
 
-class LabelHasCommunity(db.Model):
+class LabelHasCommunityModel(db.Model):
     __tablename__ = "Label_has_Community"
 
     # Attributes
-    user_id = db.Column(
+    label_id = db.Column(
         "Label_id_label", db.Integer, db.ForeignKey("Label.id_label"), primary_key=True
     )
     community_id = db.Column(
@@ -26,13 +26,7 @@ class LabelHasCommunity(db.Model):
         default=datetime.datetime.utcnow,
     )
 
-    # Relationships
-    label = db.relationship("LabelModel", back_populates="label_has_community")
-    community = db.relationship(
-        "CommunityModel", back_populates="user_belongs_to_community"
-    )
-
     # Methods
-    def __init__(self, user_id, community_id):
-        self.user_id = user_id
+    def __init__(self, label_id, community_id):
+        self.label_id = label_id
         self.community_id = community_id

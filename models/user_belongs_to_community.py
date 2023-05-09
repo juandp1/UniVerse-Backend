@@ -26,12 +26,6 @@ class UserBelongsToCommunityModel(db.Model):
         default=datetime.datetime.utcnow,
     )
 
-    # Relationships
-    user = db.relationship("UserModel", back_populates="user_belongs_to_community")
-    community = db.relationship(
-        "CommunityModel", back_populates="user_belongs_to_community"
-    )
-
     # Methods
     def __init__(self, user_id, community_id):
         self.user_id = user_id

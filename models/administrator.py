@@ -21,7 +21,12 @@ class AdministratorModel(db.Model):
     )
 
     # Relationships
-    user = db.relationship("UserModel", back_populates="administrator")
+    administrator_manage_community = db.relationship(
+        "AdministratorManageCommunityModel",
+        backref="administrator",
+    )
+    document = db.relationship("DocumentModel", back_populates="administrator")
+    topic = db.relationship("TopicModel", back_populates="administrator")
 
     # Methods
     def __init__(self, id):

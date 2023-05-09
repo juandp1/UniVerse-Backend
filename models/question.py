@@ -10,18 +10,6 @@ class QuestionModel(db.Model):
     title = db.Column("title", db.String(60), nullable=False)
     description = db.Column("description", db.String(120), nullable=True)
     score = db.Column("score", db.Integer, nullable=False, default=0)
-    is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
-    created_at = db.Column(
-        "created_at", db.DateTime, nullable=False, default=datetime.datetime.utcnow
-    )
-    updated_at = db.Column(
-        "updated_at",
-        db.DateTime,
-        nullable=False,
-        default=datetime.datetime.utcnow,
-    )
-
-    # Relationships
     topic_id = db.Column(
         "Topic_id_topic",
         db.Integer,
@@ -37,6 +25,19 @@ class QuestionModel(db.Model):
     user_id = db.Column(
         "User_id_user", db.Integer, db.ForeignKey("User.id_user"), nullable=False
     )
+    is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
+    created_at = db.Column(
+        "created_at", db.DateTime, nullable=False, default=datetime.datetime.utcnow
+    )
+    updated_at = db.Column(
+        "updated_at",
+        db.DateTime,
+        nullable=False,
+        default=datetime.datetime.utcnow,
+    )
+
+    # Relationships
+    response = db.relationship("ResponseModel", back_populates="question")
 
     # Methods
     def __init__(self, title, description, topic_id, community_id, user_id):

@@ -22,15 +22,15 @@ class UserModel(db.Model):
     )
 
     # Relationships
-    administrator = db.relationship(
-        "AdministratorModel", uselist=False, back_populates="user"
-    )
-
-    user_follows_label = db.relationship("UserFollowsLabelModel", back_populates="user")
-
+    administrator = db.relationship("AdministratorModel", back_populates="user")
+    document = db.relationship("DocumentModel", back_populates="user")
+    meeting = db.relationship("MeetingModel", back_populates="user")
+    question = db.relationship("QuestionModel", back_populates="user")
+    response = db.relationship("ResponseModel", back_populates="user")
     user_belongs_to_community = db.relationship(
         "UserBelongsToCommunityModel", back_populates="user"
     )
+    user_follows_label = db.relationship("UserFollowsLabelModel", back_populates="user")
 
     # Methods
     def __init__(self, email, name, password):

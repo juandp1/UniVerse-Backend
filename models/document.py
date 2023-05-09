@@ -11,6 +11,10 @@ class DocumentModel(db.Model):
     description = db.Column("description", db.String(120), nullable=True)
     file = db.Column("file", db.LargeBinary, nullable=False)
     type = db.Column("type", db.String(45), nullable=False)
+    user_id = db.Column("user_id", db.Integer, db.ForeignKey("User.id_user"))
+    administrator_id = db.Column(
+        "administrator_id", db.Integer, db.ForeignKey("Administrator.User_id_user")
+    )
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
     created_at = db.Column(
         "created_at", db.DateTime, nullable=False, default=datetime.datetime.utcnow
@@ -23,9 +27,9 @@ class DocumentModel(db.Model):
     )
 
     # Relationships
-    user_id = db.Column("user_id", db.Integer, db.ForeignKey("User.id_user"))
-    administrator_id = db.Column(
-        "administrator_id", db.Integer, db.ForeignKey("Administrator.User_id_user")
+    community_has_document_and_topic = db.relationship(
+        "CommunityHasDocumentAndTopicModel",
+        backref="community",
     )
 
     # Methods
