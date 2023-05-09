@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, make_response, request, redirect, flash
 from config.server_conf import db
-from models.Meeting import Meeting
+from controller.Meeting import Meeting
 from datetime import datetime
 
 meetings = Blueprint("meetings", __name__)
