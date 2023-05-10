@@ -23,10 +23,6 @@ class UserFollowsLabelModel(db.Model):
         default=datetime.datetime.utcnow,
     )
 
-    # Relationships
-    user = db.relationship("UserModel", back_populates="user_follows_label")
-    label = db.relationship("LabelModel", back_populates="user_follows_label")
-
     # Methods
     def __init__(self, user_id, label_id):
         self.user_id = user_id

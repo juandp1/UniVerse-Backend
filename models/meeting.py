@@ -32,8 +32,6 @@ class MeetingModel(db.Model):
         default=datetime.datetime.utcnow,
     )
 
-    # Relationships
-
     # Methods
     def __init__(self, name, description, place, date):
         self.name = name

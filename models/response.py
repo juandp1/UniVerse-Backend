@@ -28,8 +28,6 @@ class ResponseModel(db.Model):
         default=datetime.datetime.utcnow,
     )
 
-    # Relationships
-
     # Methods
     def __init__(self, description, question_id, user_id):
         self.description = description

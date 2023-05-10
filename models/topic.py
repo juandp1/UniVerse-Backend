@@ -24,13 +24,6 @@ class TopicModel(db.Model):
         default=datetime.datetime.utcnow,
     )
 
-    # Relationships
-    community_has_document_and_topic = db.relationship(
-        "CommunityHasDocumentAndTopicModel",
-        backref="community",
-    )
-    question = db.relationship("QuestionModel", back_populates="topic")
-
     # Methods
     def __init__(self, name, administrator_id):
         self.name = name

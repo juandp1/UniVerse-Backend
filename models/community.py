@@ -7,7 +7,7 @@ class CommunityModel(db.Model):
 
     # Attributes
     id = db.Column("id_community", db.Integer, primary_key=True)
-    name = db.Column("name", db.String(60), nullable=False)
+    name = db.Column("name", db.String(60), nullable=False, unique=True)
     description = db.Column("description", db.String(120), nullable=True)
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
     created_at = db.Column(
@@ -20,26 +20,31 @@ class CommunityModel(db.Model):
         default=datetime.datetime.utcnow,
     )
 
-    # Relationships
-    administrator_manage_community = db.relationship(
-        "AdministratorManageCommunityModel",
-        backref="administrator",
-    )
-    community_has_document_and_topic = db.relationship(
-        "CommunityHasDocumentAndTopicModel",
-        backref="community",
-    )
-    label_has_community = db.relationship(
-        "LabelHasCommunityModel",
-        back_populates="community",
-    )
-    meeting = db.relationship("MeetingModel", back_populates="community")
-    question = db.relationship("QuestionModel", back_populates="community")
-    user_belongs_to_community = db.relationship(
-        "UserBelongsToCommunityModel", back_populates="user"
-    )
-
     # Methods
     def __init__(self, name, description):
         self.name = name
         self.description = description
+
+    def json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "is_active": self.is_active,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+        }
+
+    def delete_to_db(self):
+        self.is_active = False
+        self.updated_at = datetime.datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def find_by_id(cls, id):
+        return cls.query.filter_by(id=id).first()

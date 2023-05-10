@@ -26,12 +26,6 @@ class DocumentModel(db.Model):
         default=datetime.datetime.utcnow,
     )
 
-    # Relationships
-    community_has_document_and_topic = db.relationship(
-        "CommunityHasDocumentAndTopicModel",
-        backref="community",
-    )
-
     # Methods
     def __init__(self, name, description, file, type, user_id, administrator_id):
         self.name = name

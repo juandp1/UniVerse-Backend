@@ -19,14 +19,6 @@ class LabelModel(db.Model):
         default=datetime.datetime.utcnow,
     )
 
-    # Relationships
-    label_has_community = db.relationship(
-        "LabelHasCommunityModel", back_populates="label"
-    )
-    user_follows_label = db.relationship(
-        "UserFollowsLabelModel", back_populates="label"
-    )
-
     # Methods
     def __init__(self, name):
         self.name = name

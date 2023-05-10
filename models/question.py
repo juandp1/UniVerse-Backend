@@ -36,9 +36,6 @@ class QuestionModel(db.Model):
         default=datetime.datetime.utcnow,
     )
 
-    # Relationships
-    response = db.relationship("ResponseModel", back_populates="question")
-
     # Methods
     def __init__(self, title, description, topic_id, community_id, user_id):
         self.title = title

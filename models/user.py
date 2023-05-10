@@ -1,5 +1,6 @@
 import datetime
 from config.server_conf import db
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class UserModel(db.Model):
@@ -21,44 +22,33 @@ class UserModel(db.Model):
         default=datetime.datetime.utcnow,
     )
 
-    # Relationships
-    administrator = db.relationship("AdministratorModel", back_populates="user")
-    document = db.relationship("DocumentModel", back_populates="user")
-    meeting = db.relationship("MeetingModel", back_populates="user")
-    question = db.relationship("QuestionModel", back_populates="user")
-    response = db.relationship("ResponseModel", back_populates="user")
-    user_belongs_to_community = db.relationship(
-        "UserBelongsToCommunityModel", back_populates="user"
-    )
-    user_follows_label = db.relationship("UserFollowsLabelModel", back_populates="user")
-
     # Methods
     def __init__(self, email, name, password):
         self.email = email
         self.name = name
-        self.password = password
+        self.password = generate_password_hash(password, "sha256")
 
     def json(self):
         return {
             "id": self.id,
             "email": self.email,
             "name": self.name,
-            "is_active": self.is_active,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
         }
 
-    @classmethod
-    def find_by_email(cls, email):
-        return cls.query.filter_by(email=email, is_active=True).first()
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
 
     def save_to_db(self):
         self.updated_at = datetime.datetime.utcnow()
         db.session.add(self)
         db.session.commit()
 
-    def delete_to_db(self):
+    def delete_from_db(self):
         self.is_active = False
         self.updated_at = datetime.datetime.utcnow()
         db.session.add(self)
         db.session.commit()
+
+    @classmethod
+    def find_by_id(cls, id):
+        return cls.query.filter_by(id=id).first()
