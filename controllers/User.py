@@ -1,6 +1,15 @@
-from flask_restful import Resource, reqparse
-from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
 from models.user import UserModel
+from datetime import datetime, timezone
+from flask_restful import Resource, reqparse
+from werkzeug.security import generate_password_hash
+from models.token_blocklist import TokenBlockListModel
+from flask_jwt_extended import (
+    create_access_token,
+    get_jwt_identity,
+    jwt_required,
+    create_refresh_token,
+    get_jwt,
+)
 
 
 class User(Resource):
@@ -18,8 +27,9 @@ class User(Resource):
     @jwt_required()
     def get(self, id):
         user = UserModel.find_by_id(id)
-        if user:
-            return user.json()
+
+        if user is not None and user.is_active:
+            return user.json(), 200
         return {"message": "User not found"}, 404
 
     @jwt_required()
@@ -29,9 +39,12 @@ class User(Resource):
             return {"message": "Not found"}, 404
 
         data = User.parser.parse_args()
-        existing_user = UserModel.query.filter_by(email=data["email"]).one_or_none()
+
+        existing_user = UserModel.query.filter_by(
+            email=data["email"], is_active=True
+        ).one_or_none()
         if (
-            existing_user
+            existing_user is not None
             and existing_user.id != id
             and UserModel.is_valid_email(data["email"])
         ):
@@ -43,7 +56,7 @@ class User(Resource):
         else:
             user.name = data["name"]
             user.email = data["email"]
-            user.password = data["password"]
+            user.password = generate_password_hash(data["password"], method="pbkdf2")
 
         user.save_to_db()
         return user.json(), 200
@@ -57,6 +70,19 @@ class User(Resource):
         user = UserModel.find_by_id(id)
         if user:
             user.delete_from_db()
+
+        token = get_jwt()
+        jti = token["jti"]
+        ttype = token["type"]
+        now = datetime.now(timezone.utc)
+
+        token = TokenBlockListModel(
+            jti,
+            type=ttype,
+            created_at=now,
+            user_id=get_jwt_identity()["id"] if ttype == "access" else None,
+        )
+        token.save_to_db()
 
         return {"message": "User deleted"}, 200
 
@@ -75,14 +101,27 @@ class UserRegister(Resource):
 
     def post(self):
         data = UserRegister.parser.parse_args()
-        existing_user = UserModel.query.filter_by(email=data["email"]).one_or_none()
+        existing_user = UserModel.query.filter_by(
+            email=data["email"], is_active=True
+        ).one_or_none()
         if existing_user:
             return {"message": "A user with that email already exists"}, 400
 
         if not UserModel.is_valid_email(data["email"]):
             return {"message": "Invalid email format"}, 400
 
+        existing_user = UserModel.query.filter_by(
+            email=data["email"], is_active=False
+        ).one_or_none()
+        if existing_user is not None:
+            user = UserModel.query.filter_by(
+                email=data["email"], is_active=False
+            ).one_or_none()
+            user.recover_user()
+            return user.json(), 201
+
         user = UserModel(**data)
+        user.password = generate_password_hash(data["password"], method="pbkdf2")
         try:
             user.save_to_db()
             return user.json(), 201
@@ -109,4 +148,23 @@ class UserLogin(Resource):
             return {"message": "Invalid credentials"}, 401
 
         access_token = create_access_token(identity=user.json())
-        return {"access_token": access_token}, 200
+        refresh_token = create_refresh_token(identity=user.json())
+        return {"access_token": access_token, "refresh_token": refresh_token}, 200
+
+
+class UserLogout(Resource):
+    @jwt_required(verify_type=False)
+    def delete(self):
+        token = get_jwt()
+        jti = token["jti"]
+        ttype = token["type"]
+        now = datetime.now(timezone.utc)
+
+        token = TokenBlockListModel(
+            jti,
+            type=ttype,
+            created_at=now,
+            user_id=get_jwt_identity()["id"] if ttype == "access" else None,
+        )
+        token.save_to_db()
+        return {"message": "Successfully logged out"}, 200
