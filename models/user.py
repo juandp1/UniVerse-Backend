@@ -1,3 +1,4 @@
+import re
 import datetime
 from config.server_conf import db
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -52,3 +53,11 @@ class UserModel(db.Model):
     @classmethod
     def find_by_id(cls, id):
         return cls.query.filter_by(id=id).first()
+
+    @staticmethod
+    def is_valid_email(email):
+        regex = re.compile(
+            r"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+"
+        )
+
+        return re.fullmatch(regex, email)

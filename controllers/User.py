@@ -30,7 +30,11 @@ class User(Resource):
 
         data = User.parser.parse_args()
         existing_user = UserModel.query.filter_by(email=data["email"]).one_or_none()
-        if existing_user and existing_user.id != id:
+        if (
+            existing_user
+            and existing_user.id != id
+            and UserModel.is_valid_email(data["email"])
+        ):
             return {"message": "A user with that email already exists"}, 400
 
         user = UserModel.find_by_id(id)
@@ -74,6 +78,9 @@ class UserRegister(Resource):
         existing_user = UserModel.query.filter_by(email=data["email"]).one_or_none()
         if existing_user:
             return {"message": "A user with that email already exists"}, 400
+
+        if not UserModel.is_valid_email(data["email"]):
+            return {"message": "Invalid email format"}, 400
 
         user = UserModel(**data)
         try:
