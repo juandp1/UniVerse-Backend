@@ -1,9 +1,12 @@
 from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
-from flask_sqlalchemy import SQLAlchemy
-
+from config.database_conf import db
 from config.server_variables import *
+from config.routes_conf import start_routes
+
+# Import models
+from config.load_models import *
 
 # Configuring the Flask app
 app = Flask(__name__)
@@ -19,12 +22,12 @@ app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
 jwt = JWTManager(app)
 api = Api(app)
 
-# Configuring the Flask-SQLAlchemy
-db = SQLAlchemy()
-
 with app.app_context():
     db.init_app(app)
     db.create_all()
+
+# Start the routes
+start_routes(api)
 
 
 def run_server():
