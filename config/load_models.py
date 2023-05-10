@@ -9,6 +9,7 @@ from models.label import LabelModel
 from models.meeting import MeetingModel
 from models.question import QuestionModel
 from models.response import ResponseModel
+from models.token_blocklist import TokenBlockListModel
 from models.topic import TopicModel
 from models.user_belongs_to_community import UserBelongsToCommunityModel
 from models.user_follows_label import UserFollowsLabelModel
