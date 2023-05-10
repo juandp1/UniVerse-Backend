@@ -7,7 +7,7 @@ class TopicModel(db.Model):
 
     # Attributes
     id = db.Column("id_topic", db.Integer, primary_key=True)
-    name = db.Column("name", db.String(45), nullable=False)
+    name = db.Column("name", db.String(45), nullable=False, unique=True)
     administrator_id = db.Column(
         "Administrator_User_id_user",
         db.Integer,
