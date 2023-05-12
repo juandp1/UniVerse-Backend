@@ -30,18 +30,16 @@ class CommunityModel(db.Model):
             "id": self.id,
             "name": self.name,
             "description": self.description,
-            "is_active": self.is_active,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
         }
 
-    def delete_to_db(self):
+    def delete_from_db(self):
         self.is_active = False
         self.updated_at = datetime.datetime.utcnow()
         db.session.add(self)
         db.session.commit()
 
     def save_to_db(self):
+        self.updated_at = datetime.datetime.utcnow()
         db.session.add(self)
         db.session.commit()
 
