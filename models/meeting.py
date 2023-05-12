@@ -33,8 +33,42 @@ class MeetingModel(db.Model):
     )
 
     # Methods
-    def __init__(self, name, description, place, date):
+    def __init__(self, name, description, place, date, community_id, user_id):
         self.name = name
         self.description = description
         self.place = place
         self.date = date
+        self.community_id = community_id
+        self.user_id = user_id
+
+    def json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "place": self.place,
+            "date": self.date.strftime("%Y-%m-%d %H:%M:%S"),
+            "community_id": self.community_id,
+            "author_id": self.user_id,
+        }
+
+    def save_to_db(self):
+        self.updated_at = datetime.datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    def delete_from_db(self):
+        self.is_active = False
+        db.session.commit()
+
+    @classmethod
+    def find_by_id(cls, id):
+        return cls.query.filter_by(id=id, is_active=True).one_or_none()
+
+    @classmethod
+    def find_by_comm_id(cls, comm_id):
+        return cls.query.filter_by(community_id=comm_id, is_active=True).all()
+
+    @classmethod
+    def find_by_author_id(cls, user_id):
+        return cls.query.filter_by(user_id=user_id, is_active=True).one_or_none()
