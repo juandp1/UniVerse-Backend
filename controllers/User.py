@@ -58,8 +58,11 @@ class User(Resource):
             user.email = data["email"]
             user.password = generate_password_hash(data["password"], method="pbkdf2")
 
-        user.save_to_db()
-        return user.json(), 200
+        try:
+            user.save_to_db()
+            return user.json(), 200
+        except:
+            return {"message": "An error occurred updating the user."}, 500
 
     @jwt_required()
     def delete(self, id):
@@ -82,9 +85,12 @@ class User(Resource):
             created_at=now,
             user_id=get_jwt_identity()["id"] if ttype == "access" else None,
         )
-        token.save_to_db()
 
-        return {"message": "User deleted"}, 200
+        try:
+            token.save_to_db()
+            return {"message": "User deleted"}, 200
+        except:
+            return {"message": "An error occurred deleting the user."}, 500
 
 
 class UserRegister(Resource):
@@ -166,5 +172,9 @@ class UserLogout(Resource):
             created_at=now,
             user_id=get_jwt_identity()["id"] if ttype == "access" else None,
         )
-        token.save_to_db()
-        return {"message": "Successfully logged out"}, 200
+
+        try:
+            token.save_to_db()
+            return {"message": "Successfully logged out"}, 200
+        except:
+            return {"message": "An error occurred logging out"}, 500

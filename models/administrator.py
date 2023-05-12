@@ -23,3 +23,7 @@ class AdministratorModel(db.Model):
     # Methods
     def __init__(self, id):
         self.id = id
+
+    @classmethod
+    def find_by_id(cls, id):
+        return cls.query.filter_by(id=id, is_active=True).first()
