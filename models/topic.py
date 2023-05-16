@@ -28,3 +28,14 @@ class TopicModel(db.Model):
     def __init__(self, name, administrator_id):
         self.name = name
         self.administrator_id = administrator_id
+
+    def json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "administrator_id": self.administrator_id,
+        }
+
+    @classmethod
+    def find_by_id(cls, id):
+        return cls.query.filter_by(id=id, is_active=True).one_or_none()
