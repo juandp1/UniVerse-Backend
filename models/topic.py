@@ -36,6 +36,27 @@ class TopicModel(db.Model):
             "administrator_id": self.administrator_id,
         }
 
+    def save_to_db(self):
+        self.updated_at = datetime.datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    def delete_from_db(self):
+        self.is_active = False
+        self.updated_at = datetime.datetime.utcnow()
+        db.session.delete(self)
+        db.session.commit()
+
+    @classmethod
+    def find_by_name(cls, name):
+        return cls.query.filter_by(name=name, is_active=True).first()
+
+    @classmethod
+    def find_by_name_and_administrator_id(cls, name, administrator_id):
+        return cls.query.filter_by(
+            name=name, administrator_id=administrator_id, is_active=True
+        ).first()
+
     @classmethod
     def find_by_id(cls, id):
-        return cls.query.filter_by(id=id, is_active=True).one_or_none()
+        return cls.query.filter_by(id=id, is_active=True).first()
