@@ -30,3 +30,34 @@ class UserBelongsToCommunityModel(db.Model):
     def __init__(self, user_id, community_id):
         self.user_id = user_id
         self.community_id = community_id
+
+    def json(self):
+        return {
+            "user_id": self.user_id,
+            "community_id": self.community_id,
+        }
+
+    def save_to_db(self):
+        self.updated_at = datetime.datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    def delete_from_db(self):
+        self.is_active = False
+        self.updated_at = datetime.datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def find_by_user_id(cls, user_id):
+        return cls.query.filter_by(user_id=user_id, is_active=True).all()
+
+    @classmethod
+    def find_by_community_id(cls, community_id):
+        return cls.query.filter_by(community_id=community_id, is_active=True).all()
+
+    @classmethod
+    def find_by_user_id_and_community_id(cls, user_id, community_id):
+        return cls.query.filter_by(
+            user_id=user_id, community_id=community_id, is_active=True
+        ).first()
