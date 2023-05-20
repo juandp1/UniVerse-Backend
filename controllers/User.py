@@ -155,7 +155,11 @@ class UserLogin(Resource):
 
         access_token = create_access_token(identity=user.json())
         refresh_token = create_refresh_token(identity=user.json())
-        return {"access_token": access_token, "refresh_token": refresh_token}, 200
+        return {
+            "user": user.json(),
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+        }, 200
 
 
 class UserLogout(Resource):

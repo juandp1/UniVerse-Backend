@@ -3,6 +3,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.community import CommunityModel
 from models.question import QuestionModel
 from models.topic import TopicModel
+from models.user_belongs_to_community import UserBelongsToCommunityModel
+from models.user import UserModel
 
 
 class Questions(Resource):
@@ -116,6 +118,44 @@ class QuestionsByCommunityAndTopic(Resource):
 
         questions = QuestionModel.find_by_community_and_topic(community_id, topic_id)
 
+        if questions is None:
+            return {"message": "Questions not found"}, 404
+
+        return {"questions": [question.json() for question in questions]}, 200
+
+
+class QuestionListByCommunity(Resource):
+    @jwt_required()
+    def get(self, community_id):
+        jwt_user = get_jwt_identity()
+        user_id = jwt_user["id"]
+
+        if not CommunityModel.find_by_id(community_id):
+            return {"message": "Community not found"}, 404
+        if not UserBelongsToCommunityModel.find_by_user_id_and_community_id(
+            user_id, community_id
+        ):
+            return {"message": "User not found in community"}, 404
+
+        questions = QuestionModel.find_by_community(community_id)
+        if questions is None:
+            return {"message": "Questions not found"}, 404
+
+        return {"questions": [question.json() for question in questions]}, 200
+
+
+class QuestionListByTopic(Resource):
+    @jwt_required()
+    def get(self, topic_id):
+        jwt_user = get_jwt_identity()
+        user_id = jwt_user["id"]
+
+        if not TopicModel.find_by_id(topic_id):
+            return {"message": "Topic not found"}, 404
+        if not UserModel.find_by_id(user_id):
+            return {"message": "User not found"}, 404
+
+        questions = QuestionModel.find_by_topic(topic_id)
         if questions is None:
             return {"message": "Questions not found"}, 404
 

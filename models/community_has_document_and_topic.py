@@ -40,3 +40,25 @@ class CommunityHasDocumentAndTopicModel(db.Model):
         self.community_id = community_id
         self.document_id = document_id
         self.topic_id = topic_id
+
+    def json(self):
+        return {
+            "community_id": self.community_id,
+            "document_id": self.document_id,
+            "topic_id": self.topic_id,
+        }
+
+    def save_to_db(self):
+        self.updated_at = datetime.datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    def delete_from_db(self):
+        self.is_active = False
+        self.updated_at = datetime.datetime.utcnow()
+        db.session.delete(self)
+        db.session.commit()
+
+    @classmethod
+    def find_by_community_id(cls, community_id):
+        return cls.query.filter_by(community_id=community_id, is_active=True).first()

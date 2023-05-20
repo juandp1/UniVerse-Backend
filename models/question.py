@@ -79,3 +79,11 @@ class QuestionModel(db.Model):
         return cls.query.filter_by(
             community_id=community_id, topic_id=topic_id, is_active=True
         ).all()
+
+    @classmethod
+    def find_by_community(cls, community_id):
+        return cls.query.filter_by(community_id=community_id, is_active=True).all()
+
+    @classmethod
+    def find_by_topic(cls, topic_id):
+        return cls.query.filter_by(topic_id=topic_id, is_active=True).all()
