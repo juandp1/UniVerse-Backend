@@ -1,13 +1,9 @@
-from flask import Blueprint
-
-auth_router = Blueprint("auth_router", __name__)
-
-
-@auth_router.route("/login")
-def login():
-    return "<p1>login</p1>"
+# Import resources
+from controllers.User import UserRegister, UserLogin, UserLogout
 
 
-@auth_router.route("/register")
-def register():
-    return "<p1>register</p1>"
+# Add resources to the API
+def add_resources(api):
+    api.add_resource(UserLogin, "/api/login")
+    api.add_resource(UserRegister, "/api/register")
+    api.add_resource(UserLogout, "/api/logout")
