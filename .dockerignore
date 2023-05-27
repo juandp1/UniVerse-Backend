@@ -5,7 +5,6 @@
 instance/*
 !instance/.gitignore
 .webassets-cache
-.env
 .env.test
 
 ### Flask.Python Stack ###
@@ -296,3 +295,6 @@ pyrightconfig.json
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/python,flask,visualstudiocode,git
+
+mysql-data
+mysql-data/*

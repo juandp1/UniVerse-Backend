@@ -1,12 +1,19 @@
-FROM python:3.10-slim-buster
+FROM python:3.10-slim-bullseye
 
-WORKDIR /home/universe_backend
-COPY . .
+RUN apt-get -y update \
+&& apt-get -y upgrade
 
-RUN apt update -y
-RUN apt install build-essential -y
-RUN apt install default-libmysqlclient-dev -y
+RUN apt install -y build-essential default-libmysqlclient-dev
 RUN pip install --upgrade pip
+
+ENV SERVER /home/universe_backend
+
+RUN mkdir -p $SERVER
+WORKDIR $SERVER
+
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-CMD [ "python3", "server.py" ]
+COPY . .
+
+CMD ["python", "server.py"]
