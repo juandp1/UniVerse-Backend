@@ -10,7 +10,7 @@ class UserModel(db.Model):
     # Attributes
     id = db.Column("id_user", db.Integer, primary_key=True)
     email = db.Column("email", db.String(100), nullable=False, unique=True)
-    name = db.Column("name", db.String(100), nullable=False)
+    name = db.Column("name", db.String(100), nullable=False, unique=True)
     password = db.Column("password", db.String(255), nullable=False)
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
     created_at = db.Column(
