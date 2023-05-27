@@ -86,7 +86,7 @@ FLUSH PRIVILEGES;
 Then, run the following command:
 
 ```bash
-docker-compose up -d
+docker-compose up
 ```
 
 You can see the status of your containers from `Docker Desktop`, if something fails, just restart the containers. To restart the containers, run the following command:
