@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_restful import Api
+from flask_cors import CORS
 from datetime import timedelta
 from flask_jwt_extended import JWTManager
 from config.database_conf import db
@@ -11,6 +12,7 @@ from config.load_models import *
 
 # Configuring the Flask app
 app = Flask(__name__)
+cors = CORS(app)
 
 app.secret_key = SECRET_KEY
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_CONNECTION_URI
