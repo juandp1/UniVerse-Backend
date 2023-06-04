@@ -185,3 +185,16 @@ class CreateCommunity(Resource):
             return community.json(), 201
         except:
             return {"message": "An error occurred creating the community."}, 500
+
+
+class SearchCommunity(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument("name", type=str, required=True)
+    def post(self):
+        data = CommunityName.parser.parse_args()
+        return {
+            "communities": [
+                community.json()
+                for community in CommunityModel.query.filter_by(name=data["name"], is_active=True).all()
+            ]
+        }
