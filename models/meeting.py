@@ -1,5 +1,7 @@
+import re
 import datetime
 from config.server_conf import db
+from sqlalchemy import func
 
 
 class MeetingModel(db.Model):
@@ -76,3 +78,17 @@ class MeetingModel(db.Model):
     @classmethod
     def find_by_date(cls, comm_id, user_id, date):
         return cls.query.filter_by(community_id=comm_id, user_id=user_id, date=date, is_active=True).all()
+    
+    @classmethod
+    def find_by_dates(cls, comm_id, dateI, dateF):
+        a = cls.query.filter_by(community_id=comm_id, is_active=True).all()
+        if a:
+            return cls.query.filter(cls.date.between(dateI, dateF)).all()
+
+    @staticmethod
+    def is_valid_date(date):
+        regex = re.compile(
+            r"\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$"
+        )
+
+        return re.fullmatch(regex, date)

@@ -112,16 +112,22 @@ class SearchMeetingDate(Resource):
     parser.add_argument(
         "dateI", type=str, required=True, help="This field cannot be blank."
     )
-    # parser.add_argument(
-    #     "dateF", type=str, required=True, help="This field cannot be blank."
-    # )
+    parser.add_argument(
+        "dateF", type=str, required=True, help="This field cannot be blank."
+    )
 
     @jwt_required()
-    def get(self, com_id):
+    def get(self, comm_id):
         data = SearchMeetingDate.parser.parse_args()
-        current_user = get_jwt_identity()
-        meetings = MeetingModel.find_by_date(com_id, current_user["id"], data["dateI"])
+
+        if not MeetingModel.is_valid_date(data["dateI"]):
+            return {"message": "Invalid dateI format"}, 400
+        
+        if not MeetingModel.is_valid_date(data["dateF"]):
+            return {"message": "Invalid dateF format"}, 400
+    
+        meetings = MeetingModel.find_by_dates(comm_id, data["dateI"], data["dateF"])
         if meetings:
             return {"meetings": [meeting.json() for meeting in meetings]}, 200
         else:
-            return {"message": "Community not found"}, 404
+            return {"message": "Meetings not found"}, 404
