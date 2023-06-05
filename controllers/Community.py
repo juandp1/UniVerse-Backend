@@ -195,6 +195,6 @@ class SearchCommunity(Resource):
         return {
             "communities": [
                 community.json()
-                for community in CommunityModel.query.filter_by(name=data["name"], is_active=True).all()
+                for community in CommunityModel.query.filter_by(name=data, is_active=True).all()
             ]
         }

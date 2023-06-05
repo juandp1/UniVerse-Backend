@@ -72,3 +72,7 @@ class MeetingModel(db.Model):
     @classmethod
     def find_by_author_id(cls, user_id):
         return cls.query.filter_by(user_id=user_id, is_active=True).one_or_none()
+    
+    @classmethod
+    def find_by_date(cls, comm_id, date):
+        return cls.query.filter_by(community_id=comm_id, date=date, is_active=True).all()
