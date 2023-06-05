@@ -75,6 +75,12 @@ class QuestionModel(db.Model):
         return cls.query.filter_by(is_active=True).all()
 
     @classmethod
+    def find_more_recent(cls):
+        return (
+            cls.query.filter_by(is_active=True).order_by(cls.created_at.desc()).first()
+        )
+
+    @classmethod
     def find_by_community_and_topic(cls, community_id, topic_id):
         return cls.query.filter_by(
             community_id=community_id, topic_id=topic_id, is_active=True

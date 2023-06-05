@@ -17,6 +17,17 @@ class TopicList(Resource):
         return {"message": "Topic not found"}, 404
 
 
+class MostRecentTopic(Resource):
+    @jwt_required()
+    def get(self):
+        return {
+            "communities": [
+                topic.json()
+                for topic in TopicModel.query.filter_by(is_active=True).all()
+            ]
+        }, 200
+
+
 class TopicId(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument(

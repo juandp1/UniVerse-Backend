@@ -131,7 +131,7 @@ class CommunityList(Resource):
                 community.json()
                 for community in CommunityModel.query.filter_by(is_active=True).all()
             ]
-        }
+        }, 200
 
 
 class CreateCommunity(Resource):
@@ -188,16 +188,10 @@ class CreateCommunity(Resource):
 
 
 class SearchCommunity(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument("name", type=str, required=True, help="This field cannot be blank."
-    )
-    
     @jwt_required()
-    def post(self, name):
+    def get(self, name):
         community = CommunityModel.find_by_name(name)
-        if community:
-            return community.json()
-        else:
+        if community is None:
             return {"message": "Community not found"}, 404
-        
-                
+
+        return community.json(), 200
