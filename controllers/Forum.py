@@ -2,6 +2,7 @@ from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.community import CommunityModel
 from models.question import QuestionModel
+from models.response import ResponseModel
 from models.topic import TopicModel
 from models.user_belongs_to_community import UserBelongsToCommunityModel
 from models.user import UserModel
@@ -170,3 +171,91 @@ class MostRecentQuestion(Resource):
             return {"message": "Question not found"}, 404
 
         return question.json(), 200
+
+  
+class QuestionVoted(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+        "vote_type", type=str, required=False, help="This field cannot be blank."
+    )
+
+    @jwt_required()
+    def post(self,id_question):
+        data = QuestionVoted.parser.parse_args()
+        jwt_user = get_jwt_identity()
+        user_id = jwt_user["id"]
+
+        question = QuestionModel.find_by_id(id_question)
+
+        if question is None:
+            return {"message": "Question not found"}, 404
+
+        if question.user_id == user_id:
+            return {"message": "You cannot vote on your own question"}, 400
+
+        if data["vote_type"] == "1":
+            question.update_score(1)
+        elif data["vote_type"] == "-1":
+            question.update_score(-1)
+        else:
+            return {"message": "Invalid vote type"}, 400
+
+        try:
+            question.save_to_db()
+            return question.json(), 200
+        except:
+            return {"message": "An error occurred while voting on the question"}, 500
+
+
+class MostVotedQuestion(Resource):
+    @jwt_required()
+    def get(self):
+        response = ResponseModel.find_more_voted()
+        if response is None:
+            return {"message": "Question not found"}, 404
+
+        return response.json(), 200
+    
+
+class ResponseVoted(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+        "vote_type", type=str, required=False, help="This field cannot be blank."
+    )
+
+    @jwt_required()
+    def post(self,id_response):
+        data = ResponseVoted.parser.parse_args()
+        jwt_user = get_jwt_identity()
+        user_id = jwt_user["id"]
+
+        response = ResponseModel.find_by_id(id_response)
+
+        if response is None:
+            return {"message": "Response not found"}, 404
+
+        if response.user_id == user_id:
+            return {"message": "You cannot vote on your own response"}, 400
+
+        if data["vote_type"] == "1":
+            response.update_score(1)
+        elif data["vote_type"] == "-1":
+            response.update_score(-1)
+        else:
+            return {"message": "Invalid vote type"}, 400
+
+        try:
+            response.save_to_db()
+            return response.json(), 200
+        except:
+            return {"message": "An error occurred while voting on the response"}, 500
+
+
+class MostVotedResponse(Resource):
+    @jwt_required()
+    def get(self):
+        response = ResponseModel.find_more_voted()
+        if response is None:
+            return {"message": "Response not found"}, 404
+
+        return response.json(), 200
