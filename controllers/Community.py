@@ -194,10 +194,10 @@ class SearchCommunity(Resource):
     
     @jwt_required()
     def post(self, name):
-        data = CommunityName.parser.parse_args()
-        return {
-            "communities": [
-                community.json()
-                for community in CommunityModel.query.filter_by(name=data["name"], is_active=True).all()
-            ]
-        }
+        community = CommunityModel.find_by_name(name)
+        if community:
+            return community.json()
+        else:
+            return {"message": "Community not found"}, 404
+        
+                
