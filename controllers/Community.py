@@ -185,3 +185,13 @@ class CreateCommunity(Resource):
             return community.json(), 201
         except:
             return {"message": "An error occurred creating the community."}, 500
+
+
+class SearchCommunity(Resource):
+    @jwt_required()
+    def get(self, name):
+        community = CommunityModel.find_by_name(name)
+        if community is None:
+            return {"message": "Community not found"}, 404
+
+        return community.json(), 200

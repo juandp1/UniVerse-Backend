@@ -74,6 +74,14 @@ class MeetingModel(db.Model):
         return cls.query.filter_by(user_id=user_id, is_active=True).one_or_none()
 
     @classmethod
+    def find_by_dates(cls, comm_id, initial_date, final_date):
+        return (
+            cls.query.filter_by(community_id=comm_id, is_active=True)
+            .filter(cls.date.between(initial_date, final_date))
+            .all()
+        )
+
+    @classmethod
     def next_meeting_of_community(cls, comm_id):
         return (
             cls.query.filter_by(is_active=True)
