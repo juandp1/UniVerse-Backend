@@ -105,3 +105,23 @@ class MeetingId(Resource):
             return meeting.json(), 200
         except:
             return {"message": "An error occurred updating the meeting."}, 500
+
+
+class SearchMeetingDate(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+        "dateI", type=str, required=True, help="This field cannot be blank."
+    )
+    # parser.add_argument(
+    #     "dateF", type=str, required=True, help="This field cannot be blank."
+    # )
+
+    @jwt_required()
+    def get(self, com_id):
+        data = SearchMeetingDate.parser.parse_args()
+        current_user = get_jwt_identity()
+        meetings = MeetingModel.find_by_date(com_id, current_user["id"], data["dateI"])
+        if meetings:
+            return {"meetings": [meeting.json() for meeting in meetings]}, 200
+        else:
+            return {"message": "Community not found"}, 404
