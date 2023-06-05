@@ -189,12 +189,15 @@ class CreateCommunity(Resource):
 
 class SearchCommunity(Resource):
     parser = reqparse.RequestParser()
-    parser.add_argument("name", type=str, required=True)
-    def post(self):
+    parser.add_argument("name", type=str, required=True, help="This field cannot be blank."
+    )
+    
+    @jwt_required()
+    def post(self, name):
         data = CommunityName.parser.parse_args()
         return {
             "communities": [
                 community.json()
-                for community in CommunityModel.query.filter_by(name=data, is_active=True).all()
+                for community in CommunityModel.query.filter_by(name=data["name"], is_active=True).all()
             ]
         }
