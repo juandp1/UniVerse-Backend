@@ -72,3 +72,13 @@ class MeetingModel(db.Model):
     @classmethod
     def find_by_author_id(cls, user_id):
         return cls.query.filter_by(user_id=user_id, is_active=True).one_or_none()
+
+    @classmethod
+    def next_meeting_of_community(cls, comm_id):
+        return (
+            cls.query.filter_by(is_active=True)
+            .filter(cls.community_id == comm_id)
+            .filter(cls.date >= datetime.datetime.utcnow())
+            .order_by(cls.date.asc())
+            .first()
+        )

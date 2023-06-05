@@ -20,12 +20,12 @@ class TopicList(Resource):
 class MostRecentTopic(Resource):
     @jwt_required()
     def get(self):
-        topics = TopicModel.query.filter_by(is_active=True).all()
-        topic_list = {"topics": [topic.json() for topic in topics]}
-        if len(topic_list) == 0:
-            return {"message": "No topics created"}, 204
-        else:
-            return topic_list['topics'][len(topic_list)-1],200
+        return {
+            "communities": [
+                topic.json()
+                for topic in TopicModel.query.filter_by(is_active=True).all()
+            ]
+        }, 200
 
 
 class TopicId(Resource):

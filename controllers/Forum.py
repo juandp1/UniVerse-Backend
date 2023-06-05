@@ -161,12 +161,12 @@ class QuestionListByTopic(Resource):
 
         return {"questions": [question.json() for question in questions]}, 200
 
+
 class MostRecentQuestion(Resource):
     @jwt_required()
     def get(self):
-        questions = QuestionModel.find_all()
-        question_list = {"questions": [question.json() for question in questions]}
-        if len(question_list) == 0:
-            return {"message": "No questions created"}, 204
-        else:
-            return question_list['questions'][len(question_list)-1], 200
+        question = QuestionModel.find_more_recent()
+        if question is None:
+            return {"message": "Question not found"}, 404
+
+        return question.json(), 200

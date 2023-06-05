@@ -1,4 +1,11 @@
-from controllers.Topic import TopicList, TopicId, TopicName, Topic, TopicListByCommunity, MostRecentTopic
+from controllers.Topic import (
+    TopicList,
+    TopicId,
+    TopicName,
+    Topic,
+    TopicListByCommunity,
+    MostRecentTopic,
+)
 
 
 # Add resources to the API
