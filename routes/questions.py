@@ -4,6 +4,7 @@ from controllers.Forum import (
     QuestionsByCommunityAndTopic,
     QuestionListByCommunity,
     QuestionListByTopic,
+    MostRecentQuestion,
 )
 
 
@@ -18,3 +19,4 @@ def add_resources(api):
         QuestionListByCommunity, "/api/community/<int:community_id>/questions"
     )
     api.add_resource(QuestionListByTopic, "/api/questions/topic/<int:topic_id>")
+    api.add_resource(MostRecentQuestion, "/api/questions/recent_question")
