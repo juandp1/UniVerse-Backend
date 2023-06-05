@@ -1,4 +1,3 @@
-import re
 import datetime
 from config.server_conf import db
 
@@ -75,16 +74,12 @@ class MeetingModel(db.Model):
         return cls.query.filter_by(user_id=user_id, is_active=True).one_or_none()
 
     @classmethod
-    def find_by_dates(cls, comm_id, dateI, dateF):
-        a = cls.query.filter_by(community_id=comm_id, is_active=True).all()
-        if a:
-            return cls.query.filter(cls.date.between(dateI, dateF)).all()
-
-    @staticmethod
-    def is_valid_date(date):
-        regex = re.compile(r"\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$")
-
-        return re.fullmatch(regex, date)
+    def find_by_dates(cls, comm_id, initial_date, final_date):
+        return (
+            cls.query.filter_by(community_id=comm_id, is_active=True)
+            .filter(cls.date.between(initial_date, final_date))
+            .all()
+        )
 
     @classmethod
     def next_meeting_of_community(cls, comm_id):

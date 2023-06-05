@@ -123,24 +123,23 @@ class MeetingId(Resource):
 class SearchMeetingDate(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument(
-        "dateI", type=str, required=True, help="This field cannot be blank."
+        "community_id", type=int, required=True, help="This field cannot be blank."
     )
     parser.add_argument(
-        "dateF", type=str, required=True, help="This field cannot be blank."
+        "initial_date", type=str, required=True, help="This field cannot be blank."
+    )
+    parser.add_argument(
+        "final_date", type=str, required=True, help="This field cannot be blank."
     )
 
     @jwt_required()
-    def get(self, comm_id):
+    def get(self):
         data = SearchMeetingDate.parser.parse_args()
-
-        if not MeetingModel.is_valid_date(data["dateI"]):
-            return {"message": "Invalid dateI format"}, 400
-        
-        if not MeetingModel.is_valid_date(data["dateF"]):
-            return {"message": "Invalid dateF format"}, 400
-    
-        meetings = MeetingModel.find_by_dates(comm_id, data["dateI"], data["dateF"])
-        if meetings:
-            return {"meetings": [meeting.json() for meeting in meetings]}, 200
-        else:
-            return {"message": "Meetings not found"}, 404
+        return {
+            "communities": [
+                community.json()
+                for community in MeetingModel.find_by_dates(
+                    data["community_id"], data["initial_date"], data["final_date"]
+                )
+            ]
+        }, 200
