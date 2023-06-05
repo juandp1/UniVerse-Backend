@@ -53,6 +53,28 @@ class MeetingCommunity(Resource):
             return {"message": "An error occurred creating the meeting"}, 500
 
 
+class NextMeeting(Resource):
+    @jwt_required()
+    def get(self, comm_id):
+        from datetime import datetime
+        meetings = MeetingModel.query.filter_by(
+            community_id=comm_id, is_active=True
+        ).all()
+        meeting_list = {"meetings": [meeting.json() for meeting in meetings]}
+        current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        future_meetings = []
+        for meeting in meeting_list['meetings']:
+         if meeting['date'] > current_date:
+           future_meetings.append(meeting['date'])
+        if len(future_meetings)==0:
+            return {"message": "There are no comming meetings"}, 204
+        else:
+            return min(future_meetings), 200
+
+
+
+
+
 class MeetingId(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument(
