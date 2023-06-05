@@ -1,5 +1,6 @@
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from models.community import CommunityModel
 from models.meeting import MeetingModel
 
 
@@ -51,6 +52,18 @@ class MeetingCommunity(Resource):
         except Exception as e:
             print(e)
             return {"message": "An error occurred creating the meeting"}, 500
+
+
+class NextMeeting(Resource):
+    @jwt_required()
+    def get(self, comm_id):
+        if not CommunityModel.find_by_id(comm_id):
+            return {"message": "Community not found"}, 404
+
+        meeting = MeetingModel.next_meeting_of_community(comm_id)
+        if meeting is None:
+            return {"message": "Meeting not found"}, 404
+        return meeting.json(), 200
 
 
 class MeetingId(Resource):

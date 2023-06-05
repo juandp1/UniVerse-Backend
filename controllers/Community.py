@@ -131,7 +131,7 @@ class CommunityList(Resource):
                 community.json()
                 for community in CommunityModel.query.filter_by(is_active=True).all()
             ]
-        }
+        }, 200
 
 
 class CreateCommunity(Resource):

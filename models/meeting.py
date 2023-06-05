@@ -1,7 +1,6 @@
 import re
 import datetime
 from config.server_conf import db
-from sqlalchemy import func
 
 
 class MeetingModel(db.Model):
@@ -74,7 +73,7 @@ class MeetingModel(db.Model):
     @classmethod
     def find_by_author_id(cls, user_id):
         return cls.query.filter_by(user_id=user_id, is_active=True).one_or_none()
-        
+
     @classmethod
     def find_by_dates(cls, comm_id, dateI, dateF):
         a = cls.query.filter_by(community_id=comm_id, is_active=True).all()
@@ -83,8 +82,16 @@ class MeetingModel(db.Model):
 
     @staticmethod
     def is_valid_date(date):
-        regex = re.compile(
-            r"\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$"
-        )
+        regex = re.compile(r"\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$")
 
         return re.fullmatch(regex, date)
+
+    @classmethod
+    def next_meeting_of_community(cls, comm_id):
+        return (
+            cls.query.filter_by(is_active=True)
+            .filter(cls.community_id == comm_id)
+            .filter(cls.date >= datetime.datetime.utcnow())
+            .order_by(cls.date.asc())
+            .first()
+        )

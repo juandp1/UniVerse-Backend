@@ -300,3 +300,6 @@ pyrightconfig.json
 init.sql
 mysql-data
 mysql-data/*
+
+.idea
+.idea/*
