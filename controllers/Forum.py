@@ -160,3 +160,13 @@ class QuestionListByTopic(Resource):
             return {"message": "Questions not found"}, 404
 
         return {"questions": [question.json() for question in questions]}, 200
+
+
+class MostRecentQuestion(Resource):
+    @jwt_required()
+    def get(self):
+        question = QuestionModel.find_more_recent()
+        if question is None:
+            return {"message": "Question not found"}, 404
+
+        return question.json(), 200
