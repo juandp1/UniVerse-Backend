@@ -33,3 +33,31 @@ class ResponseModel(db.Model):
         self.description = description
         self.question_id = question_id
         self.user_id = user_id
+
+    def json(self):
+        return {
+            "num_response": self.num_response,
+            "description": self.description,
+            "score": self.score,
+            "question_id": self.question_id,
+            "user_id": self.user_id,
+        }
+
+    def save_to_db(self):
+        self.updated_at = datetime.datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    def update_score(self, increment):
+        self.score += increment
+        self.save_to_db()
+
+    @classmethod
+    def find_by_id(cls, id):
+        return cls.query.filter_by(id=id, is_active=True).first()
+
+    @classmethod
+    def find_more_voted(cls):
+        return (
+            cls.query.filter_by(is_active=True).order_by(cls.score.desc()).first()
+        )

@@ -66,6 +66,10 @@ class QuestionModel(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def update_score(self, increment):
+        self.score += increment
+        self.save_to_db()
+
     @classmethod
     def find_by_id(cls, id):
         return cls.query.filter_by(id=id, is_active=True).first()
@@ -93,3 +97,9 @@ class QuestionModel(db.Model):
     @classmethod
     def find_by_topic(cls, topic_id):
         return cls.query.filter_by(topic_id=topic_id, is_active=True).all()
+    
+    @classmethod
+    def find_more_voted(cls):
+        return (
+            cls.query.filter_by(is_active=True).order_by(cls.score.desc()).first()
+        )
