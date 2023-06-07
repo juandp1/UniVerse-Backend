@@ -43,6 +43,12 @@ class ResponseModel(db.Model):
             "user_id": self.user_id,
         }
 
+    def delete_from_db(self):
+        self.is_active = False
+        self.updated_at = datetime.datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
     def save_to_db(self):
         self.updated_at = datetime.datetime.utcnow()
         db.session.add(self)
@@ -53,11 +59,21 @@ class ResponseModel(db.Model):
         self.save_to_db()
 
     @classmethod
+    def find_all(cls):
+        return cls.query.filter_by(is_active=True).all()
+
+    @classmethod
+    def find_by_num_response(cls, num_response):
+        return cls.query.filter_by(num_response=num_response, is_active=True).first()
+
+    @classmethod
+    def find_by_question(cls, question_id):
+        return cls.query.filter_by(question_id=question_id, is_active=True).all()
+
+    @classmethod
     def find_by_id(cls, id):
         return cls.query.filter_by(id=id, is_active=True).first()
 
     @classmethod
     def find_more_voted(cls):
-        return (
-            cls.query.filter_by(is_active=True).order_by(cls.score.desc()).first()
-        )
+        return cls.query.filter_by(is_active=True).order_by(cls.score.desc()).first()
