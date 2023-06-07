@@ -6,6 +6,7 @@ from models.response import ResponseModel
 from models.topic import TopicModel
 from models.user_belongs_to_community import UserBelongsToCommunityModel
 from models.user import UserModel
+from models.response import ResponseModel
 
 
 class Questions(Resource):
@@ -172,7 +173,7 @@ class MostRecentQuestion(Resource):
 
         return question.json(), 200
 
-  
+
 class QuestionVoted(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument(
@@ -180,7 +181,7 @@ class QuestionVoted(Resource):
     )
 
     @jwt_required()
-    def post(self,id_question):
+    def post(self, id_question):
         data = QuestionVoted.parser.parse_args()
         jwt_user = get_jwt_identity()
         user_id = jwt_user["id"]
@@ -215,7 +216,7 @@ class MostVotedQuestion(Resource):
             return {"message": "Question not found"}, 404
 
         return response.json(), 200
-    
+
 
 class ResponseVoted(Resource):
     parser = reqparse.RequestParser()
@@ -224,7 +225,7 @@ class ResponseVoted(Resource):
     )
 
     @jwt_required()
-    def post(self,id_response):
+    def post(self, id_response):
         data = ResponseVoted.parser.parse_args()
         jwt_user = get_jwt_identity()
         user_id = jwt_user["id"]
@@ -259,3 +260,102 @@ class MostVotedResponse(Resource):
             return {"message": "Response not found"}, 404
 
         return response.json(), 200
+
+
+class Responses(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+        "description", type=str, required=True, help="This field cannot be blank."
+    )
+    parser.add_argument(
+        "question_id", type=int, required=True, help="This field cannot be blank."
+    )
+
+    @jwt_required()
+    def get(self):
+        responses = ResponseModel.find_all()
+        return {"responses": [response.json() for response in responses]}, 200
+
+    @jwt_required()
+    def post(self):
+        data = Responses.parser.parse_args()
+        jwt_user = get_jwt_identity()
+        user_id = jwt_user["id"]
+
+        if not QuestionModel.find_by_id(data["question_id"]):
+            return {"message": "Question not found"}, 404
+
+        response = ResponseModel(**data, user_id=user_id)
+
+        try:
+            response.save_to_db()
+            return response.json(), 201
+        except:
+            return {"message": "An error occurred creating the response."}, 500
+
+
+class ResponseNumResponse(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+        "description", type=str, required=False, help="This field cannot be blank."
+    )
+
+    @jwt_required()
+    def put(self, response_num):
+        data = ResponseNumResponse.parser.parse_args()
+        jwt_user = get_jwt_identity()
+        user_id = jwt_user["id"]
+
+        response = ResponseModel.find_by_num_response(response_num)
+
+        if response is None:
+            return {"message": "Response not found"}, 404
+
+        if response.user_id != user_id:
+            return {"message": "Response not found"}, 404
+
+        if data["description"]:
+            response.description = data["description"]
+
+        try:
+            response.save_to_db()
+            return response.json(), 200
+        except:
+            return {"message": "An error occurred updating the response."}, 500
+
+    @jwt_required()
+    def delete(self, response_num):
+        jwt_user = get_jwt_identity()
+        user_id = jwt_user["id"]
+
+        response = ResponseModel.find_by_num_response(response_num)
+
+        if response is None:
+            return {"message": "Response not found"}, 404
+
+        if response.user_id != user_id:
+            return {"message": "Response not found"}, 404
+
+        try:
+            response.delete_from_db()
+            return {"message": "Response deleted"}, 200
+        except:
+            return {"message": "An error occurred deleting the response."}, 500
+
+
+class ResponseListByQuestion(Resource):
+    @jwt_required()
+    def get(self, question_id):
+        jwt_user = get_jwt_identity()
+        user_id = jwt_user["id"]
+
+        if not QuestionModel.find_by_id(question_id):
+            return {"message": "Question not found"}, 404
+        if not UserModel.find_by_id(user_id):
+            return {"message": "User not found"}, 404
+
+        responses = ResponseModel.find_by_question(question_id)
+        if responses is None:
+            return {"message": "Responses not found"}, 404
+
+        return {"responses": [response.json() for response in responses]}, 200
