@@ -13,7 +13,10 @@ class DocumentModel(db.Model):
     type = db.Column("type", db.String(45), nullable=False)
     user_id = db.Column("user_id", db.Integer, db.ForeignKey("User.id_user"))
     administrator_id = db.Column(
-        "administrator_id", db.Integer, db.ForeignKey("Administrator.User_id_user")
+        "administrator_id",
+        db.Integer,
+        db.ForeignKey("Administrator.User_id_user"),
+        nullable=True,
     )
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
     created_at = db.Column(
@@ -34,3 +37,52 @@ class DocumentModel(db.Model):
         self.type = type
         self.user_id = user_id
         self.administrator_id = administrator_id
+
+    def json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "file": self.file,
+            "type": self.type,
+            "user_id": self.user_id,
+            "administrator_id": self.administrator_id,
+        }
+
+    def save_to_db(self):
+        DocumentModel.remove_non_accepted_documents()
+        self.updated_at = datetime.datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    def delete_from_db(self):
+        self.is_active = False
+        self.updated_at = datetime.datetime.utcnow()
+        db.session.delete(self)
+        db.session.commit()
+
+    @classmethod
+    def find_by_id(cls, id):
+        return cls.query.filter_by(id=id, is_active=True).first()
+
+    @classmethod
+    def find_by_user_id(cls, user_id):
+        return cls.query.filter_by(user_id=user_id, is_active=True).all()
+
+    @classmethod
+    def find_by_administrator_id(cls, administrator_id):
+        return cls.query.filter_by(
+            administrator_id=administrator_id, is_active=True
+        ).all()
+
+    @classmethod
+    def find_by_name(cls, name):
+        return cls.query.filter_by(name=name, is_active=True).first()
+
+    @classmethod
+    def remove_non_accepted_documents(cls):
+        cls.query.filter(
+            cls.is_active == False,
+            cls.created_at < datetime.datetime.utcnow() - datetime.timedelta(days=15),
+        ).delete()
+        db.session.commit()
