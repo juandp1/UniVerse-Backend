@@ -35,6 +35,8 @@ class TopicId(Resource):
     def delete(self, topic_id):
         topic = TopicModel.find_by_id(topic_id)
 
+        CommunityHasDocumentAndTopicModel.delete_documents_by_topic_id(topic_id)
+
         if topic:
             topic.delete_from_db()
             return {"message": "Topic deleted."}, 200

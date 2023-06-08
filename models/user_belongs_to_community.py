@@ -45,7 +45,7 @@ class UserBelongsToCommunityModel(db.Model):
     def delete_from_db(self):
         self.is_active = False
         self.updated_at = datetime.datetime.utcnow()
-        db.session.add(self)
+        db.session.delete(self)
         db.session.commit()
 
     @classmethod

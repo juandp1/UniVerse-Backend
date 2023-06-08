@@ -1,5 +1,6 @@
 import datetime
 from config.server_conf import db
+from models.user_belongs_to_community import UserBelongsToCommunityModel
 
 
 class CommunityModel(db.Model):
@@ -35,7 +36,7 @@ class CommunityModel(db.Model):
     def delete_from_db(self):
         self.is_active = False
         self.updated_at = datetime.datetime.utcnow()
-        db.session.add(self)
+        db.session.delete(self)
         db.session.commit()
 
     def save_to_db(self):
@@ -50,3 +51,12 @@ class CommunityModel(db.Model):
     @classmethod
     def find_by_name(cls, name):
         return cls.query.filter_by(name=name, is_active=True).first()
+
+    @classmethod
+    def is_member(cls, id_user, id_community):
+        return (
+            UserBelongsToCommunityModel.query.filter_by(
+                user_id=id_user, community_id=id_community, is_active=True
+            ).one_or_none()
+            is not None
+        )
