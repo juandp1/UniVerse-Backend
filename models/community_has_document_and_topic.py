@@ -62,3 +62,13 @@ class CommunityHasDocumentAndTopicModel(db.Model):
     @classmethod
     def find_by_community_id(cls, community_id):
         return cls.query.filter_by(community_id=community_id, is_active=True).first()
+
+    @classmethod
+    def delete_documents_by_community_id(cls, community_id):
+        cls.query.filter_by(community_id=community_id, is_active=True).delete()
+        db.session.commit()
+
+    @classmethod
+    def delete_documents_by_topic_id(cls, topic_id):
+        cls.query.filter_by(topic_id=topic_id, is_active=True).delete()
+        db.session.commit()

@@ -63,7 +63,7 @@ class QuestionModel(db.Model):
     def delete_from_db(self):
         self.is_active = False
         self.updated_at = datetime.datetime.utcnow()
-        db.session.add(self)
+        db.session.delete(self)
         db.session.commit()
 
     def update_score(self, increment):
@@ -97,9 +97,11 @@ class QuestionModel(db.Model):
     @classmethod
     def find_by_topic(cls, topic_id):
         return cls.query.filter_by(topic_id=topic_id, is_active=True).all()
-    
+
+    @classmethod
+    def num_of_question_per_community(cls, community_id):
+        return cls.query.filter_by(community_id=community_id, is_active=True).count()
+
     @classmethod
     def find_more_voted(cls):
-        return (
-            cls.query.filter_by(is_active=True).order_by(cls.score.desc()).first()
-        )
+        return cls.query.filter_by(is_active=True).order_by(cls.score.desc()).first()
