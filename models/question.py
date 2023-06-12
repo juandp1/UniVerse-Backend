@@ -99,8 +99,12 @@ class QuestionModel(db.Model):
         return cls.query.filter_by(topic_id=topic_id, is_active=True).all()
 
     @classmethod
-    def num_of_question_per_community(cls, community_id):
-        return cls.query.filter_by(community_id=community_id, is_active=True).count()
+    def num_of_question_per_community(
+        cls,
+    ):
+        return (
+            cls.query.filter_by(is_active=True).count().group_by(cls.community_id).all()
+        )
 
     @classmethod
     def find_more_voted(cls):

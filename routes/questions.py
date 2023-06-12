@@ -23,4 +23,4 @@ def add_resources(api):
     api.add_resource(QuestionListByTopic, "/api/questions/topic/<int:topic_id>")
     api.add_resource(MostRecentQuestion, "/api/questions/recent_question")
     api.add_resource(QuestionVoted, "/api/questions/<int:id_question>")
-    api.add_resource(MostVotedQuestion, "/api/questions/voted_quesiton")
+    api.add_resource(MostVotedQuestion, "/api/questions/voted_question")
