@@ -91,7 +91,7 @@ class UserIsAdmin(Resource):
     )
 
     @jwt_required()
-    def get(self):
+    def post(self):
         data = UserIsAdmin.parser.parse_args()
         jwt_user = get_jwt_identity()
         user_id = jwt_user["id"]
