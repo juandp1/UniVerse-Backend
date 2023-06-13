@@ -60,3 +60,13 @@ class CommunityModel(db.Model):
             ).one_or_none()
             is not None
         )
+
+    @classmethod
+    def number_of_users(id_community):
+        users = UserBelongsToCommunityModel.find_by_community_id(community_id=id_community)
+        users_as_list = []
+        for user in users:
+            users_as_list.append(user.json())
+        return len(users_as_list)
+
+
