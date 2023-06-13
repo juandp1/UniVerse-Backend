@@ -22,3 +22,24 @@ class LabelModel(db.Model):
     # Methods
     def __init__(self, name):
         self.name = name
+
+    def json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+        }
+
+    def delete_from_db(self):
+        self.is_active = False
+        self.updated_at = datetime.datetime.utcnow()
+        db.session.delete(self)
+        db.session.commit()
+
+    def save_to_db(self):
+        self.updated_at = datetime.datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def find_by_name(cls, name):
+        return cls.query.filter_by(name=name, is_active=True).first()
