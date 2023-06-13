@@ -1,9 +1,10 @@
 from controllers.Statistics import (
     QuestionsPerCommunity,
-    CommunitiesPerLabel
-), NumberOfUsersPerCommunity
-from controllers.Statistics import UsersPerCommunity
-from controllers.Statistics import TopicsPerCommunity
+    NumberOfUsersPerCommunity,
+    CommunitiesPerLabel,
+    TopicsPerCommunity,
+    UsersPerCommunity,
+)
 
 
 def add_resources(api):
