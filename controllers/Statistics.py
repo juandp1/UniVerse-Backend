@@ -26,6 +26,8 @@ class CommunitiesPerLabel(Resource):
     def get(self):
         data = CommunitiesPerLabel.parser.parse_args()
         label = LabelModel.find_by_name(data["label"])
-        return {
-            "communities" : LabelHasCommunityModel.num_of_communities_per_label(label.id)
-        }
+        if label:
+            return {
+                "communities" : LabelHasCommunityModel.num_of_communities_per_label(label.id)
+            }
+        return {"message": "That label doesn't exist"}, 400
