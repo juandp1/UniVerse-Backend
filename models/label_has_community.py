@@ -30,3 +30,25 @@ class LabelHasCommunityModel(db.Model):
     def __init__(self, label_id, community_id):
         self.label_id = label_id
         self.community_id = community_id
+    
+    def json(self):
+        return {
+            "id_label": self.label_id,
+            "id_community": self.community_id,
+        }
+
+    def delete_from_db(self):
+        self.is_active = False
+        self.updated_at = datetime.datetime.utcnow()
+        db.session.delete(self)
+        db.session.commit()
+
+    def save_to_db(self):
+        self.updated_at = datetime.datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def num_of_communities_per_label(cls, label_id):
+        # cls.query.filter_by(is_active=True).count().group_by(label_id=label_id).all()
+        return cls.query.filter_by(label_id=label_id, is_active=True).count()

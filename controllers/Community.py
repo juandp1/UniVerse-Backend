@@ -2,6 +2,8 @@ from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.community import CommunityModel
 from models.administrator_manage_community import AdministratorManageCommunityModel
+from models.label import LabelModel
+from models.label_has_community import LabelHasCommunityModel
 
 
 class CommunityId(Resource):
@@ -142,14 +144,23 @@ class CreateCommunity(Resource):
     parser.add_argument(
         "description", type=str, required=True, help="This field cannot be blank."
     )
+    parser.add_argument(
+        "label", type=str, required=False, help="This field cannot be blank."
+    )
 
     @jwt_required()
     def post(self):
-        data = CommunityName.parser.parse_args()
+        data = CreateCommunity.parser.parse_args()
 
         existing_community = CommunityModel.find_by_name(data["name"])
         if existing_community:
             return {"message": "A community with that name already exists."}, 400
+        
+        #Create Label
+        existing_label = LabelModel.find_by_name(data["label"])
+        if not existing_label:
+            existing_label = LabelModel(name=data["label"])
+            existing_label.save_to_db()
 
         existing_community = CommunityModel.query.filter_by(
             name=data["name"], is_active=False
@@ -159,6 +170,10 @@ class CreateCommunity(Resource):
             existing_community.is_active = True
             try:
                 existing_community.save_to_db()
+
+                #Create Connection Label-Community
+                label = LabelHasCommunityModel(label_id=existing_label.id, community_id=existing_community.id)
+                label.save_to_db()
 
                 # Update Admins
                 jwt_user = get_jwt_identity()
@@ -171,9 +186,13 @@ class CreateCommunity(Resource):
             except:
                 return {"message": "An error occurred creating the community."}, 500
 
-        community = CommunityModel(**data)
+        community = CommunityModel(name=data["name"], description=data["description"])
         try:
             community.save_to_db()
+
+            #Create Connection Label-Community
+            label = LabelHasCommunityModel(label_id=existing_label.id, community_id=community.id)
+            label.save_to_db()
 
             # Update Admins
             jwt_user = get_jwt_identity()
