@@ -50,5 +50,4 @@ class LabelHasCommunityModel(db.Model):
 
     @classmethod
     def num_of_communities_per_label(cls, label_id):
-        # cls.query.filter_by(is_active=True).count().group_by(label_id=label_id).all()
         return cls.query.filter_by(label_id=label_id, is_active=True).count()
