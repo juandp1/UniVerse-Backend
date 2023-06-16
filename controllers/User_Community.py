@@ -109,7 +109,7 @@ class UserIsAdmin(Resource):
         if not UserModel.find_by_id(data["user_id"]):
             return {"message": "User not found"}, 404
 
-        if not AdministratorModel.find_by_user_id(data["user_id"]):
+        if not AdministratorModel.find_by_id(data["user_id"]):
             return {"message": "User is not admin"}, 400
 
         user_belongs_to_community = (
