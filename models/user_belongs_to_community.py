@@ -61,7 +61,7 @@ class UserBelongsToCommunityModel(db.Model):
         return cls.query.filter_by(
             user_id=user_id, community_id=community_id, is_active=True
         ).first()
-    
+
     @classmethod
     def num_of_users_per_community(
         cls,

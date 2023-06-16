@@ -1,6 +1,7 @@
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.community import CommunityModel
+from models.user_belongs_to_community import UserBelongsToCommunityModel
 from models.administrator_manage_community import AdministratorManageCommunityModel
 from models.label import LabelModel
 from models.label_has_community import LabelHasCommunityModel
@@ -166,27 +167,7 @@ class CreateCommunity(Resource):
             name=data["name"], is_active=False
         ).first()
         if existing_community:
-            existing_community.description = data["description"]
-            existing_community.is_active = True
-            try:
-                existing_community.save_to_db()
-
-                # Create Connection Label-Community
-                label = LabelHasCommunityModel(
-                    label_id=existing_label.id, community_id=existing_community.id
-                )
-                label.save_to_db()
-
-                # Update Admins
-                jwt_user = get_jwt_identity()
-                user_id = jwt_user["id"]
-                AdministratorManageCommunityModel.add_admin_to_community(
-                    user_id, existing_community.id
-                )
-
-                return existing_community.json(), 200
-            except:
-                return {"message": "An error occurred creating the community."}, 500
+            return {"message": "This community already exists"}, 400
 
         community = CommunityModel(name=data["name"], description=data["description"])
         try:
@@ -198,9 +179,15 @@ class CreateCommunity(Resource):
             )
             label.save_to_db()
 
-            # Update Admins
+            # Create Connection User-Community
             jwt_user = get_jwt_identity()
             user_id = jwt_user["id"]
+            user_comm = UserBelongsToCommunityModel(
+                user_id=user_id, community_id=community.id
+            )
+            user_comm.save_to_db()
+
+            # Update Admins
             AdministratorManageCommunityModel.add_admin_to_community(
                 user_id, community.id
             )
