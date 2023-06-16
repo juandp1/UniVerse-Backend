@@ -94,8 +94,7 @@ class Topic(Resource):
             if TopicModel.find_by_name(data["name"]):
                 return {"message": "Topic already exists"}, 400
 
-            topic = TopicModel(**data)
-
+            topic = TopicModel(name=data["name"], administrator_id=user_id)
             try:
                 topic.save_to_db()
                 return topic.json(), 201

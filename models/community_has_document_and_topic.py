@@ -72,3 +72,7 @@ class CommunityHasDocumentAndTopicModel(db.Model):
     def delete_documents_by_topic_id(cls, topic_id):
         cls.query.filter_by(topic_id=topic_id, is_active=True).delete()
         db.session.commit()
+
+    @classmethod
+    def find_topics_of_community(cls, community_id):
+        cls.query.filter_by(community_id=community_id, is_active=True).all()
