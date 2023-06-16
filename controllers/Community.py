@@ -145,7 +145,7 @@ class CreateCommunity(Resource):
         "description", type=str, required=True, help="This field cannot be blank."
     )
     parser.add_argument(
-        "label", type=str, required=False, help="This field cannot be blank."
+        "label", type=str, required=True, help="This field cannot be blank."
     )
 
     @jwt_required()
@@ -155,8 +155,8 @@ class CreateCommunity(Resource):
         existing_community = CommunityModel.find_by_name(data["name"])
         if existing_community:
             return {"message": "A community with that name already exists."}, 400
-        
-        #Create Label
+
+        # Create Label
         existing_label = LabelModel.find_by_name(data["label"])
         if not existing_label:
             existing_label = LabelModel(name=data["label"])
@@ -171,8 +171,10 @@ class CreateCommunity(Resource):
             try:
                 existing_community.save_to_db()
 
-                #Create Connection Label-Community
-                label = LabelHasCommunityModel(label_id=existing_label.id, community_id=existing_community.id)
+                # Create Connection Label-Community
+                label = LabelHasCommunityModel(
+                    label_id=existing_label.id, community_id=existing_community.id
+                )
                 label.save_to_db()
 
                 # Update Admins
@@ -190,8 +192,10 @@ class CreateCommunity(Resource):
         try:
             community.save_to_db()
 
-            #Create Connection Label-Community
-            label = LabelHasCommunityModel(label_id=existing_label.id, community_id=community.id)
+            # Create Connection Label-Community
+            label = LabelHasCommunityModel(
+                label_id=existing_label.id, community_id=community.id
+            )
             label.save_to_db()
 
             # Update Admins

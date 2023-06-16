@@ -138,7 +138,7 @@ class UserRegister(Resource):
 class UserLogin(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument(
-        "username", type=str, required=False, help="This field cannot be blank."
+        "name", type=str, required=False, help="This field cannot be blank."
     )
     parser.add_argument(
         "email", type=str, required=False, help="This field cannot be blank."
@@ -150,19 +150,17 @@ class UserLogin(Resource):
     def post(self):
         data = UserLogin.parser.parse_args()
         email = data["email"]
-        username = data["username"]
+        name = data["name"]
         password = data["password"]
 
-        if not email and not username:
+        if not email and not name:
             return {"message": "Invalid credentials"}, 401
 
         user = None
         if email:
             user = UserModel.query.filter_by(email=email, is_active=True).one_or_none()
-        elif username:
-            user = UserModel.query.filter_by(
-                username=username, is_active=True
-            ).one_or_none()
+        elif name:
+            user = UserModel.query.filter_by(name=name, is_active=True).one_or_none()
 
         if not user or not user.check_password(password):
             return {"message": "Invalid credentials"}, 401
