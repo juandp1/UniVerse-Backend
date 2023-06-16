@@ -120,12 +120,15 @@ class UserIsAdmin(Resource):
         if user_belongs_to_community is None:
             return {"message": "User not in community"}, 400
 
-        if not AdministratorManageCommunityModel.user_is_admin_of_community(
-            data["user_id"], data["community_id"]
-        ):
+        user_is_admin_of_community = (
+            AdministratorManageCommunityModel.user_is_admin_of_community(
+                data["user_id"], data["community_id"]
+            )
+        )
+        if not user_is_admin_of_community:
             return {"message": "User is not admin"}, 400
 
-        return user_belongs_to_community.json(), 200
+        return user_is_admin_of_community, 200
 
 
 class UserIsMember(Resource):
