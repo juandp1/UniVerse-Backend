@@ -26,7 +26,7 @@ class NumUserPerCommunityId(Resource):
 
 
 class TopicsPerCommunity(Resource):
-    @jwt_required
+    @jwt_required()
     def get(self, community_id):
         return {
             "num_topics": CommunityHasDocumentAndTopicModel.num_of_topics_per_community(
