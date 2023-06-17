@@ -64,9 +64,3 @@ class TopicModel(db.Model):
     @classmethod
     def get_name_by_id(cls, id):
         return cls.query.filter_by(id=id, is_active=True).first().name
-
-    @classmethod
-    def num_of_topics_per_community(cls, community_id):
-        res_data = cls.query.filter_by(community_id=community_id, is_active=True).all()
-        print(res_data)
-        return len(res_data)
