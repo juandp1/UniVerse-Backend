@@ -9,29 +9,9 @@ from models.user_belongs_to_community import UserBelongsToCommunityModel
 
 class QuestionsPerCommunity(Resource):
     @jwt_required()
-    def get(self):
+    def get(self, community_id):
         return {
-            "questions": [
-                question.json()
-                for question in QuestionModel.num_of_question_per_community()
-            ]
-        }
-
-
-class NumberOfUsersPerCommunity(Resource):
-    @jwt_required()
-    def get(self):
-        return UserBelongsToCommunityModel.num_of_users_per_community()
-
-
-class QuestionsPerCommunity(Resource):
-    @jwt_required()
-    def get(self):
-        return {
-            "questions": [
-                question.json()
-                for question in QuestionModel.num_of_question_per_community()
-            ]
+            "num_questions": QuestionModel.num_of_question_per_community(community_id)
         }
 
 
@@ -47,13 +27,18 @@ class NumUserPerCommunityId(Resource):
 
 class TopicsPerCommunity(Resource):
     @jwt_required
-    def get(self):
+    def get(self, community_id):
         return {
-            "topics_per_community": [
-                topics_per_community.json()
-                for topics_per_community in QuestionModel.num_of_topics_per_community()
-            ]
+            "num_topics": LabelHasCommunityModel.num_of_topics_per_community(
+                community_id
+            )
         }
+
+
+class ListUsersPerComm(Resource):
+    @jwt_required()
+    def get(self):
+        return UserBelongsToCommunityModel.num_of_users_per_community()
 
 
 class CommunitiesPerLabel(Resource):

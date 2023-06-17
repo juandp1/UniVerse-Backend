@@ -30,7 +30,7 @@ class LabelHasCommunityModel(db.Model):
     def __init__(self, label_id, community_id):
         self.label_id = label_id
         self.community_id = community_id
-    
+
     def json(self):
         return {
             "id_label": self.label_id,
@@ -49,5 +49,5 @@ class LabelHasCommunityModel(db.Model):
         db.session.commit()
 
     @classmethod
-    def num_of_communities_per_label(cls, label_id):
-        return cls.query.filter_by(label_id=label_id, is_active=True).count()
+    def num_of_topics_per_community(cls, community_id):
+        return cls.query.filter_by(community_id=community_id, is_active=True).count()
