@@ -93,24 +93,28 @@ class Topic(Resource):
         jwt_user = get_jwt_identity()
         user_id = jwt_user["id"]
 
-        if AdministratorModel.find_by_id(user_id):
-            if TopicModel.find_by_name(data["name"]):
-                return {"message": "Topic already exists"}, 400
+        if not AdministratorModel.find_by_id(user_id):
+            return {"message": "You are not an administrator"}, 401
 
-            topic = TopicModel(name=data["name"], administrator_id=user_id)
-            try:
-                topic.save_to_db()
-            except:
-                return {"message": "An error occurred creating the topic."}, 500
+        if TopicModel.find_by_name(data["name"]):
+            return {"message": "Topic already exists"}, 400
+        if not CommunityModel.find_by_id(data["community_id"]):
+            return {"message": "Community not found"}, 404
 
-            relation = CommunityHasDocumentAndTopicModel(
-                community_id=data["community_id"], topic_id=topic.id
-            )
-            try:
-                relation.save_to_db()
-                return topic.json(), 201
-            except:
-                return {"message": "An error occurred creating the relation."}, 500
+        topic = TopicModel(name=data["name"], administrator_id=user_id)
+        try:
+            topic.save_to_db()
+        except:
+            return {"message": "An error occurred creating the topic."}, 500
+
+        relation = CommunityHasDocumentAndTopicModel(
+            community_id=data["community_id"], topic_id=topic.id
+        )
+        try:
+            relation.save_to_db()
+            return topic.json(), 201
+        except:
+            return {"message": "An error occurred creating the relation."}, 500
 
 
 class TopicListByCommunity(Resource):
