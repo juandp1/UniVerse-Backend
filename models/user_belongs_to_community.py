@@ -66,6 +66,12 @@ class UserBelongsToCommunityModel(db.Model):
     def num_of_users_per_community(
         cls,
     ):
-        return (
-            cls.query.filter_by(is_active=True).count().group_by(cls.community_id).all()
-        )
+        res_query = cls.query.filter_by(is_active=True).all()
+        res = {}
+        for each in res_query:
+            id_com = each.community_id
+            if id_com not in res:
+                res[id_com] = 1
+            else:
+                res[id_com] += 1
+        return res

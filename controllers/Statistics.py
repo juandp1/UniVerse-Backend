@@ -45,14 +45,9 @@ class QuestionsPerCommunity(Resource):
 
 
 class UsersPerCommunity(Resource):
-    @jwt_required()
+    # @jwt_required()
     def get(self):
-        return {
-            "users_belongs_to_community": [
-                user_belongs_to_community.json()
-                for user_belongs_to_community in UserBelongsToCommunityModel.num_of_users_per_community()
-            ]
-        }
+        return UserBelongsToCommunityModel.num_of_users_per_community()
 
 
 class TopicsPerCommunity(Resource):
