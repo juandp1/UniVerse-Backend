@@ -156,12 +156,13 @@ class UserLogin(Resource):
         if not email and not name:
             return {"message": "Invalid credentials"}, 401
 
-        user = None
-        if email:
-            user = UserModel.query.filter_by(email=email, is_active=True).one_or_none()
-        elif name:
-            user = UserModel.query.filter_by(name=name, is_active=True).one_or_none()
+        user_email = UserModel.query.filter_by(email=email, is_active=True).one_or_none()
+        user_name = UserModel.query.filter_by(name=name, is_active=True).one_or_none()
 
+        if user_email is None and user_name is None:
+            return {"message": "Invalid credentials"}, 401
+
+        user = user_email if user_email is not None else user_name
         if not user or not user.check_password(password):
             return {"message": "Invalid credentials"}, 401
 

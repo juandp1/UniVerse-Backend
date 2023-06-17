@@ -83,6 +83,9 @@ class Topic(Resource):
     parser.add_argument(
         "name", type=str, required=True, help="This field cannot be blank."
     )
+    parser.add_argument(
+        "community_id", type=int, required=True, help="This field cannot be blank."
+    )
 
     @jwt_required()
     def post(self):
@@ -97,9 +100,17 @@ class Topic(Resource):
             topic = TopicModel(name=data["name"], administrator_id=user_id)
             try:
                 topic.save_to_db()
-                return topic.json(), 201
             except:
                 return {"message": "An error occurred creating the topic."}, 500
+
+            relation = CommunityHasDocumentAndTopicModel(
+                community_id=data["community_id"], topic_id=topic.id
+            )
+            try:
+                relation.save_to_db()
+                return topic.json(), 201
+            except:
+                return {"message": "An error occurred creating the relation."}, 500
 
 
 class TopicListByCommunity(Resource):
@@ -114,9 +125,13 @@ class TopicListByCommunity(Resource):
             return {"message": "Community not found"}, 404
 
         topics = CommunityHasDocumentAndTopicModel.find_topics_of_community(
-            community_id
+            community_id=community_id
         )
-        if not topics:
+        if topics is None:
             return {"message": "Topics not found"}, 404
 
-        return {"topics": [topic.json() for topic in topics]}, 200
+        temp_dict = {"topics": [topic.json() for topic in topics]}
+        for item in temp_dict["topics"]:
+            item["topic_name"] = TopicModel.get_name_by_id(item["topic_id"])
+
+        return temp_dict, 200

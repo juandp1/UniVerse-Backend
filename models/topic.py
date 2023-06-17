@@ -60,3 +60,7 @@ class TopicModel(db.Model):
     @classmethod
     def find_by_id(cls, id):
         return cls.query.filter_by(id=id, is_active=True).first()
+
+    @classmethod
+    def get_name_by_id(cls, id):
+        return cls.query.filter_by(id=id, is_active=True).first().name

@@ -11,12 +11,13 @@ class CommunityHasDocumentAndTopicModel(db.Model):
         db.Integer,
         db.ForeignKey("Community.id_community"),
         primary_key=True,
+        nullable=True,
     )
     document_id = db.Column(
         "Document_id_document",
         db.Integer,
         db.ForeignKey("Document.id_document"),
-        primary_key=True,
+        nullable=True,
     )
     topic_id = db.Column(
         "Topic_id_topic",
@@ -36,7 +37,7 @@ class CommunityHasDocumentAndTopicModel(db.Model):
     )
 
     # Methods
-    def __init__(self, community_id, document_id, topic_id):
+    def __init__(self, community_id, topic_id, document_id=None):
         self.community_id = community_id
         self.document_id = document_id
         self.topic_id = topic_id
@@ -75,4 +76,4 @@ class CommunityHasDocumentAndTopicModel(db.Model):
 
     @classmethod
     def find_topics_of_community(cls, community_id):
-        cls.query.filter_by(community_id=community_id, is_active=True).all()
+        return cls.query.filter_by(community_id=community_id, is_active=True).all()
