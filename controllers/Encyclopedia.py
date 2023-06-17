@@ -4,6 +4,7 @@ from models.document import DocumentModel
 from models.topic import TopicModel
 from models.community import CommunityModel
 from models.administrator_manage_community import AdministratorManageCommunityModel
+from models.community_has_document_and_topic import CommunityHasDocumentAndTopicModel
 
 
 class Documents(Resource):
@@ -52,19 +53,54 @@ class Documents(Resource):
         if AdministratorManageCommunityModel.user_is_admin_of_community(
             user_id, community_id
         ):
-            document = DocumentModel(**data, user_id=user_id, administrator_id=user_id)
+            document = DocumentModel(
+                data["name"],
+                data["description"] if data["description"] else "",
+                data["file"],
+                data["type"],
+                user_id,
+                user_id,
+            )
             try:
                 document.save_to_db()
-                return document.json(), 201
             except:
                 return {"message": "An error occurred creating the document."}, 500
 
-        document = DocumentModel(**data, user_id=user_id, is_active=False)
-        try:
-            document.save_to_db()
+            comm_has_doc_and_topic = CommunityHasDocumentAndTopicModel(
+                community_id=community_id,
+                document_id=document.id,
+                topic_id=data["topic_id"],
+            )
+            try:
+                comm_has_doc_and_topic.save_to_db()
+            except:
+                return {"message": "An error occurred creating the document."}, 500
             return document.json(), 201
+
+        document = DocumentModel(
+            data["name"],
+            data["description"] if data["description"] else "",
+            data["file"],
+            data["type"],
+            user_id,
+            None,
+        )
+        try:
+            document.is_active = False
+            document.save_to_db()
         except:
             return {"message": "An error occurred creating the document."}, 500
+
+        comm_has_doc_and_topic = CommunityHasDocumentAndTopicModel(
+            community_id=community_id,
+            document_id=document.id,
+            topic_id=data["topic_id"],
+        )
+        try:
+            comm_has_doc_and_topic.save_to_db()
+        except:
+            return {"message": "An error occurred creating the document."}, 500
+        return document.json(), 201
 
 
 class DocumentsByTopic(Resource):
