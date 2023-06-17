@@ -46,7 +46,7 @@ class Documents(Resource):
             return {"message": "Topic not found"}, 404
         if not CommunityModel.find_by_id(community_id):
             return {"message": "Community not found"}, 404
-        if not CommunityModel.find_by_id(community_id).is_member(user_id):
+        if not CommunityModel.is_member(user_id, community_id):
             return {"message": "User not member of community"}, 404
 
         if AdministratorManageCommunityModel.user_is_admin_of_community(
