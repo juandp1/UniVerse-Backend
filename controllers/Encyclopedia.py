@@ -70,6 +70,21 @@ class Documents(Resource):
             return {"message": "An error occurred creating the document."}, 500
 
 
+class DocumentsByTopic(Resource):
+    @jwt_required()
+    def get(self, topic_id):
+        if not TopicModel.find_by_id(topic_id):
+            return {"message": "Topic not found"}, 404
+        return {
+            "documents": [
+                document.json()
+                for document in DocumentModel.query.filter_by(
+                    topic_id=topic_id, is_active=True
+                ).all()
+            ]
+        }, 200
+
+
 class RejectDocument(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument(
