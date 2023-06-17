@@ -15,7 +15,7 @@ class Documents(Resource):
         "description", type=str, required=False, help="This field cannot be blank."
     )
     parser.add_argument(
-        "file", type=int, required=True, help="This field cannot be blank."
+        "file", type=str, required=True, help="This field cannot be blank."
     )
     parser.add_argument(
         "type", type=int, required=True, help="This field cannot be blank."
