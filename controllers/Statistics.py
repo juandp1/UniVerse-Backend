@@ -1,10 +1,10 @@
 from flask_restful import Resource, reqparse
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
 from models.question import QuestionModel
-from models.community import CommunityModel
 from models.label import LabelModel
 from models.label_has_community import LabelHasCommunityModel
 from models.user_belongs_to_community import UserBelongsToCommunityModel
+from models.community_has_document_and_topic import CommunityHasDocumentAndTopicModel
 
 
 class QuestionsPerCommunity(Resource):
@@ -29,7 +29,7 @@ class TopicsPerCommunity(Resource):
     @jwt_required
     def get(self, community_id):
         return {
-            "num_topics": LabelHasCommunityModel.num_of_topics_per_community(
+            "num_topics": CommunityHasDocumentAndTopicModel.num_of_topics_per_community(
                 community_id
             )
         }

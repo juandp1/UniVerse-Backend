@@ -47,7 +47,3 @@ class LabelHasCommunityModel(db.Model):
         self.updated_at = datetime.datetime.utcnow()
         db.session.add(self)
         db.session.commit()
-
-    @classmethod
-    def num_of_topics_per_community(cls, community_id):
-        return cls.query.filter_by(community_id=community_id, is_active=True).count()
