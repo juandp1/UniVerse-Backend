@@ -75,3 +75,7 @@ class UserBelongsToCommunityModel(db.Model):
             else:
                 res[id_com] += 1
         return res
+
+    @classmethod
+    def num_of_users_per_community_id(cls, community_id):
+        return cls.query.filter_by(community_id=community_id, is_active=True).count()

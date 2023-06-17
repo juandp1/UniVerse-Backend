@@ -21,16 +21,7 @@ class QuestionsPerCommunity(Resource):
 class NumberOfUsersPerCommunity(Resource):
     @jwt_required()
     def get(self):
-        communities = [
-            community.json()
-            for community in CommunityModel.query.filter_by(is_active=True).all()
-        ]
-        num_users_per_community = {}
-        for each in communities:
-            id_com = each["id"]
-            name_com = each["name"]
-            num_users_per_community[name_com] = CommunityModel.number_of_users(id_com)
-        return num_users_per_community
+        return UserBelongsToCommunityModel.num_of_users_per_community()
 
 
 class QuestionsPerCommunity(Resource):
@@ -44,10 +35,14 @@ class QuestionsPerCommunity(Resource):
         }
 
 
-class UsersPerCommunity(Resource):
-    # @jwt_required()
-    def get(self):
-        return UserBelongsToCommunityModel.num_of_users_per_community()
+class NumUserPerCommunityId(Resource):
+    @jwt_required()
+    def get(self, community_id):
+        return {
+            "num_users": UserBelongsToCommunityModel.num_of_users_per_community_id(
+                community_id
+            )
+        }
 
 
 class TopicsPerCommunity(Resource):
