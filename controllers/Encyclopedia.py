@@ -99,7 +99,7 @@ class Documents(Resource):
         try:
             comm_has_doc_and_topic.save_to_db()
         except:
-            return {"message": "An error occurred creating the document."}, 500
+            return {"message": "An error occurred creating the relation."}, 500
         return document.json(), 201
 
 
