@@ -21,9 +21,6 @@ class Documents(Resource):
         "type", type=str, required=True, help="This field cannot be blank."
     )
     parser.add_argument(
-        "user_id", type=int, required=True, help="This field cannot be blank."
-    )
-    parser.add_argument(
         "administrator_id", type=int, required=False, help="This field cannot be blank."
     )
     parser.add_argument(
