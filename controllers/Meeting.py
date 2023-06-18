@@ -48,7 +48,7 @@ class MeetingCommunity(Resource):
 
         if not CommunityModel.find_by_id(comm_id):
             return {"message": "Community not found"}, 404
-        if meeting.date < datetime.now():
+        if datetime.strptime(data["date"], "%Y-%M-%D %H:%M:%S.%f") < datetime.now():
             return {"message": "Invalid date"}, 400
 
         try:
