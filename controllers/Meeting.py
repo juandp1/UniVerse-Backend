@@ -130,13 +130,13 @@ class SearchMeetingDate(Resource):
     )
 
     @jwt_required()
-    def post(self, community_id):
+    def post(self, comm_id):
         data = SearchMeetingDate.parser.parse_args()
         return {
             "communities": [
                 community.json()
                 for community in MeetingModel.find_by_dates(
-                    community_id, data["initial_date"], data["final_date"]
+                    comm_id, data["initial_date"], data["final_date"]
                 )
             ]
         }, 200
