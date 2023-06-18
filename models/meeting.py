@@ -79,7 +79,12 @@ class MeetingModel(db.Model):
     def find_by_dates(cls, comm_id, initial_date, final_date):
         return (
             cls.query.filter_by(community_id=comm_id, is_active=True)
-            .filter(cls.date.between(initial_date, final_date))
+            .filter(
+                cls.date.between(
+                    datetime.datetime.strptime(initial_date, "%Y-%m-%d %H:%M:%S"),
+                    datetime.datetime.strptime(final_date, "%Y-%m-%d %H:%M:%S"),
+                )
+            )
             .all()
         )
 
