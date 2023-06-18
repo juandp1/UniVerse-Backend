@@ -66,10 +66,7 @@ class UserBelongsToCommunityModel(db.Model):
         ).one_or_none()
 
     @classmethod
-    def num_of_users_per_community(
-        cls,
-    ):
-        return 1,200
+    def num_of_users_per_community(cls):
         res_query = cls.query.filter_by(is_active=True).all()
         res = {}
         for each in res_query:
