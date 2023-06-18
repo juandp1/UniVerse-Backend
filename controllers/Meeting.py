@@ -2,6 +2,7 @@ from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.community import CommunityModel
 from models.meeting import MeetingModel
+from datetime import datetime
 
 
 class MeetingsList(Resource):
@@ -41,12 +42,16 @@ class MeetingCommunity(Resource):
 
     @jwt_required()
     def post(self, comm_id):
+        data = MeetingCommunity.parser.parse_args()
+        current_user = get_jwt_identity()
+        meeting = MeetingModel(**data, community_id=comm_id, user_id=current_user["id"])
+
+        if not CommunityModel.find_by_id(comm_id):
+            return {"message": "Community not found"}, 404
+        if meeting.date < datetime.now():
+            return {"message": "Invalid date"}, 400
+
         try:
-            data = MeetingCommunity.parser.parse_args()
-            current_user = get_jwt_identity()
-            meeting = MeetingModel(
-                **data, community_id=comm_id, user_id=current_user["id"]
-            )
             meeting.save_to_db()
             return meeting.json(), 201
         except Exception as e:
