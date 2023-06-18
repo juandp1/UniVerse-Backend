@@ -43,7 +43,6 @@ class DocumentModel(db.Model):
             "id": self.id,
             "name": self.name,
             "description": self.description,
-            "file": self.file,
             "type": self.type,
             "user_id": self.user_id,
             "administrator_id": self.administrator_id,
