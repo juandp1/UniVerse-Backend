@@ -7,10 +7,16 @@ class UserFollowsLabelModel(db.Model):
 
     # Attributes
     user_id = db.Column(
-        "User_id_user", db.Integer, db.ForeignKey("User.id_user"), primary_key=True
+        "User_id_user",
+        db.Integer,
+        db.ForeignKey("User.id_user", ondelete="CASCADE"),
+        primary_key=True,
     )
     label_id = db.Column(
-        "Label_id_label", db.Integer, db.ForeignKey("Label.id_label"), primary_key=True
+        "Label_id_label",
+        db.Integer,
+        db.ForeignKey("Label.id_label", ondelete="CASCADE"),
+        primary_key=True,
     )
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
     created_at = db.Column(

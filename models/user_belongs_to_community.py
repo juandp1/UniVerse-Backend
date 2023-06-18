@@ -7,12 +7,15 @@ class UserBelongsToCommunityModel(db.Model):
 
     # Attributes
     user_id = db.Column(
-        "User_id_user", db.Integer, db.ForeignKey("User.id_user"), primary_key=True
+        "User_id_user",
+        db.Integer,
+        db.ForeignKey("User.id_user", ondelete="CASCADE"),
+        primary_key=True,
     )
     community_id = db.Column(
         "Community_id_community",
         db.Integer,
-        db.ForeignKey("Community.id_community"),
+        db.ForeignKey("Community.id_community", ondelete="CASCADE"),
         primary_key=True,
     )
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)

@@ -16,20 +16,20 @@ class CommunityHasDocumentAndTopicModel(db.Model):
     community_id = db.Column(
         "Community_id_community",
         db.Integer,
-        db.ForeignKey("Community.id_community"),
+        db.ForeignKey("Community.id_community", ondelete="CASCADE"),
         primary_key=True,
         nullable=True,
     )
     document_id = db.Column(
         "Document_id_document",
         db.Integer,
-        db.ForeignKey("Document.id_document"),
+        db.ForeignKey("Document.id_document", ondelete="CASCADE"),
         nullable=True,
     )
     topic_id = db.Column(
         "Topic_id_topic",
         db.Integer,
-        db.ForeignKey("Topic.id_topic"),
+        db.ForeignKey("Topic.id_topic", ondelete="CASCADE"),
         primary_key=True,
     )
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)

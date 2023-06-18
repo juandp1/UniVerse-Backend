@@ -14,12 +14,12 @@ class MeetingModel(db.Model):
     community_id = db.Column(
         "Community_id_community",
         db.Integer,
-        db.ForeignKey("Community.id_community"),
+        db.ForeignKey("Community.id_community", ondelete="CASCADE"),
     )
     user_id = db.Column(
         "User_id_user",
         db.Integer,
-        db.ForeignKey("User.id_user"),
+        db.ForeignKey("User.id_user", ondelete="CASCADE"),
     )
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
     created_at = db.Column(

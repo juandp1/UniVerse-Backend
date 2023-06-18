@@ -11,11 +11,13 @@ class DocumentModel(db.Model):
     description = db.Column("description", db.String(120), nullable=True)
     file = db.Column("file", db.LargeBinary(length=16777216), nullable=False)
     type = db.Column("type", db.String(45), nullable=False)
-    user_id = db.Column("user_id", db.Integer, db.ForeignKey("User.id_user"))
+    user_id = db.Column(
+        "user_id", db.Integer, db.ForeignKey("User.id_user", ondelete="CASCADE")
+    )
     administrator_id = db.Column(
         "administrator_id",
         db.Integer,
-        db.ForeignKey("Administrator.User_id_user"),
+        db.ForeignKey("Administrator.User_id_user", ondelete="CASCADE"),
         nullable=True,
     )
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)

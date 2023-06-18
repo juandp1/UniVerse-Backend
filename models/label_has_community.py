@@ -7,12 +7,15 @@ class LabelHasCommunityModel(db.Model):
 
     # Attributes
     label_id = db.Column(
-        "Label_id_label", db.Integer, db.ForeignKey("Label.id_label"), primary_key=True
+        "Label_id_label",
+        db.Integer,
+        db.ForeignKey("Label.id_label", ondelete="CASCADE"),
+        primary_key=True,
     )
     community_id = db.Column(
         "Community_id_community",
         db.Integer,
-        db.ForeignKey("Community.id_community"),
+        db.ForeignKey("Community.id_community", ondelete="CASCADE"),
         primary_key=True,
     )
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)

@@ -8,7 +8,7 @@ class TokenBlockListModel(db.Model):
     jti = db.Column(db.String(36), nullable=False, index=True)
     type = db.Column(db.String(16), nullable=False)
     user_id = db.Column(
-        db.ForeignKey("User.id_user"),
+        db.ForeignKey("User.id_user", ondelete="CASCADE"),
         nullable=False,
         default=lambda: TokenBlockListModel.get_current_user().id_user,
     )
