@@ -120,7 +120,7 @@ class DocumentsByTopic(Resource):
 
 class DocumentsPropouse(Resource):
     @jwt_required()
-    def get(self, community_id, topic_id):
+    def get(self, community_id):
         jwt_user = get_jwt_identity()
         user_id = jwt_user["id"]
 
@@ -128,8 +128,6 @@ class DocumentsPropouse(Resource):
             return {"message": "Community not found"}, 404
         if not AdministratorManageCommunityModel.user_is_admin_of_community(user_id, community_id):
             return {"message": "User not admin of community"}, 404
-        if topic_id not in CommunityHasDocumentAndTopicModel.find_topics_of_community(community_id):
-            return {"message": "Topic not found in community"}, 404
         
         return {
             "documents": [
