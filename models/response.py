@@ -12,10 +12,13 @@ class ResponseModel(db.Model):
     question_id = db.Column(
         "Question_id_question",
         db.Integer,
-        db.ForeignKey("Question.id_question"),
+        db.ForeignKey("Question.id_question", ondelete="CASCADE"),
     )
     user_id = db.Column(
-        "User_id_user", db.Integer, db.ForeignKey("User.id_user"), nullable=False
+        "User_id_user",
+        db.Integer,
+        db.ForeignKey("User.id_user", ondelete="CASCADE"),
+        nullable=False,
     )
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
     created_at = db.Column(

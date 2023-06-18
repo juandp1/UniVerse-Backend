@@ -14,13 +14,13 @@ class QuestionModel(db.Model):
     topic_id = db.Column(
         "Topic_id_topic",
         db.Integer,
-        db.ForeignKey("Topic.id_topic"),
+        db.ForeignKey("Topic.id_topic", ondelete="CASCADE"),
         nullable=False,
     )
     community_id = db.Column(
         "Community_id_community",
         db.Integer,
-        db.ForeignKey("Community.id_community"),
+        db.ForeignKey("Community.id_community", ondelete="CASCADE"),
         nullable=False,
     )
     user_id = db.Column(

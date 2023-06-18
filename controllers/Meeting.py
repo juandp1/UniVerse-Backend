@@ -2,6 +2,7 @@ from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.community import CommunityModel
 from models.meeting import MeetingModel
+from datetime import datetime
 
 
 class MeetingsList(Resource):
@@ -41,12 +42,18 @@ class MeetingCommunity(Resource):
 
     @jwt_required()
     def post(self, comm_id):
+        data = MeetingCommunity.parser.parse_args()
+        current_user = get_jwt_identity()
+        meeting = MeetingModel(**data, community_id=comm_id, user_id=current_user["id"])
+
+        if not CommunityModel.find_by_id(comm_id):
+            return {"message": "Community not found"}, 404
+
+        # Check if the date is valid
+        if datetime.strptime(data["date"], "%Y-%m-%d %H:%M:%S") < datetime.now():
+            return {"message": "Invalid date"}, 400
+
         try:
-            data = MeetingCommunity.parser.parse_args()
-            current_user = get_jwt_identity()
-            meeting = MeetingModel(
-                **data, community_id=comm_id, user_id=current_user["id"]
-            )
             meeting.save_to_db()
             return meeting.json(), 201
         except Exception as e:
@@ -123,9 +130,6 @@ class MeetingId(Resource):
 class SearchMeetingDate(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument(
-        "community_id", type=int, required=True, help="This field cannot be blank."
-    )
-    parser.add_argument(
         "initial_date", type=str, required=True, help="This field cannot be blank."
     )
     parser.add_argument(
@@ -133,13 +137,13 @@ class SearchMeetingDate(Resource):
     )
 
     @jwt_required()
-    def get(self):
+    def post(self, comm_id):
         data = SearchMeetingDate.parser.parse_args()
         return {
-            "communities": [
-                community.json()
-                for community in MeetingModel.find_by_dates(
-                    data["community_id"], data["initial_date"], data["final_date"]
+            "meetings": [
+                meeting.json()
+                for meeting in MeetingModel.find_by_dates(
+                    comm_id, data["initial_date"], data["final_date"]
                 )
             ]
         }, 200

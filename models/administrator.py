@@ -7,7 +7,10 @@ class AdministratorModel(db.Model):
 
     # Attributes
     id = db.Column(
-        "User_id_user", db.Integer, db.ForeignKey("User.id_user"), primary_key=True
+        "User_id_user",
+        db.Integer,
+        db.ForeignKey("User.id_user", ondelete="CASCADE"),
+        primary_key=True,
     )
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
     created_at = db.Column(

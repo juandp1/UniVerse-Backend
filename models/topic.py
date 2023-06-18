@@ -11,7 +11,7 @@ class TopicModel(db.Model):
     administrator_id = db.Column(
         "Administrator_User_id_user",
         db.Integer,
-        db.ForeignKey("Administrator.User_id_user"),
+        db.ForeignKey("Administrator.User_id_user", ondelete="CASCADE"),
     )
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
     created_at = db.Column(

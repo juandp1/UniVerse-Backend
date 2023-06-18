@@ -10,13 +10,13 @@ class AdministratorManageCommunityModel(db.Model):
     admin_id = db.Column(
         "Administrator_User_id_user",
         db.Integer,
-        db.ForeignKey("Administrator.User_id_user"),
+        db.ForeignKey("Administrator.User_id_user", ondelete="CASCADE"),
         primary_key=True,
     )
     community_id = db.Column(
         "Community_id_community",
         db.Integer,
-        db.ForeignKey("Community.id_community"),
+        db.ForeignKey("Community.id_community", ondelete="CASCADE"),
         primary_key=True,
     )
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)

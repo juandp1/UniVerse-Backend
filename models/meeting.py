@@ -14,12 +14,12 @@ class MeetingModel(db.Model):
     community_id = db.Column(
         "Community_id_community",
         db.Integer,
-        db.ForeignKey("Community.id_community"),
+        db.ForeignKey("Community.id_community", ondelete="CASCADE"),
     )
     user_id = db.Column(
         "User_id_user",
         db.Integer,
-        db.ForeignKey("User.id_user"),
+        db.ForeignKey("User.id_user", ondelete="CASCADE"),
     )
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
     created_at = db.Column(
@@ -79,7 +79,12 @@ class MeetingModel(db.Model):
     def find_by_dates(cls, comm_id, initial_date, final_date):
         return (
             cls.query.filter_by(community_id=comm_id, is_active=True)
-            .filter(cls.date.between(initial_date, final_date))
+            .filter(
+                cls.date.between(
+                    datetime.datetime.strptime(initial_date, "%Y-%m-%d %H:%M:%S"),
+                    datetime.datetime.strptime(final_date, "%Y-%m-%d %H:%M:%S"),
+                )
+            )
             .all()
         )
 
