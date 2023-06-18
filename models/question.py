@@ -99,7 +99,11 @@ class QuestionModel(db.Model):
     def change_user_id_for_user_name(cls,questions):
         for question in questions:
             user = UserModel.find_by_id(question["user_id"])
-            name = user["name"]
+            
+            if user is None:
+                return {"message": "User not found"}, 404
+            
+            name = user.name
             del question["user_id"]
             question["user_name"] = name    
         return questions
