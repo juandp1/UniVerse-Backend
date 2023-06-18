@@ -1,4 +1,5 @@
 import datetime
+from models.user import UserModel
 from config.server_conf import db
 
 
@@ -93,6 +94,14 @@ class QuestionModel(db.Model):
     @classmethod
     def find_by_community(cls, community_id):
         return cls.query.filter_by(community_id=community_id, is_active=True).all()
+
+    @classmethod
+    def change_user_id_for_user_name(cls,question):
+        user = UserModel.find_by_id(question["user_id"])
+        name = user["name"]
+        del question["user_id"]
+        question["user_name"] = name    
+        return question
 
     @classmethod
     def find_by_topic(cls, topic_id):

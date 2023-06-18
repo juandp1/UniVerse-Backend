@@ -142,7 +142,8 @@ class QuestionListByCommunity(Resource):
         questions = QuestionModel.find_by_community(community_id)
         if questions is None:
             return {"message": "Questions not found"}, 404
-
+        for question in questions:
+            QuestionModel.change_user_id_for_user_name(question)
         return {"questions": [question.json() for question in questions]}, 200
 
 
