@@ -123,9 +123,6 @@ class MeetingId(Resource):
 class SearchMeetingDate(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument(
-        "community_id", type=int, required=True, help="This field cannot be blank."
-    )
-    parser.add_argument(
         "initial_date", type=str, required=True, help="This field cannot be blank."
     )
     parser.add_argument(
@@ -133,13 +130,13 @@ class SearchMeetingDate(Resource):
     )
 
     @jwt_required()
-    def get(self):
+    def get(self, community_id):
         data = SearchMeetingDate.parser.parse_args()
         return {
             "communities": [
                 community.json()
                 for community in MeetingModel.find_by_dates(
-                    data["community_id"], data["initial_date"], data["final_date"]
+                    community_id, data["initial_date"], data["final_date"]
                 )
             ]
         }, 200
