@@ -86,7 +86,7 @@ class Documents(Resource):
             data["description"] if not data["description"] is None else "",
             blob,
             data["type"],
-            user_id
+            user_id,
         )
         try:
             document.is_active = False
@@ -118,7 +118,8 @@ class DocumentsByTopic(Resource):
             ]
         }, 200
 
-class DocumentsPropouse(Resource):
+
+class DocumentsPropose(Resource):
     @jwt_required()
     def get(self, community_id):
         jwt_user = get_jwt_identity()
@@ -126,15 +127,20 @@ class DocumentsPropouse(Resource):
 
         if not CommunityModel.find_by_id(community_id):
             return {"message": "Community not found"}, 404
-        if not AdministratorManageCommunityModel.user_is_admin_of_community(user_id, community_id):
+        if not AdministratorManageCommunityModel.user_is_admin_of_community(
+            user_id, community_id
+        ):
             return {"message": "User not admin of community"}, 404
-        
+
         return {
             "documents": [
                 document.json()
-                for document in CommunityHasDocumentAndTopicModel.get_propouse_by_com(community_id)
+                for document in CommunityHasDocumentAndTopicModel.get_propose_by_com(
+                    community_id
+                )
             ]
         }, 200
+
 
 class RejectDocument(Resource):
     parser = reqparse.RequestParser()
