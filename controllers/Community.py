@@ -78,6 +78,7 @@ class CommunityName(Resource):
         if community:
             return community.json()
         return {"message": "Community not found"}, 404
+    
 
     @jwt_required()
     def delete(self, name):
@@ -125,6 +126,15 @@ class CommunityName(Resource):
         except:
             return {"message": "An error occurred updating the community."}, 500
 
+class CommunitySimilarName(Resource):
+    @jwt_required()
+    def get(self, name):
+        return {
+            "communities": [
+                community.json()
+                for community in CommunityModel.find_by_similar_name(name)
+            ]
+        }, 200
 
 class CommunityList(Resource):
     @jwt_required()

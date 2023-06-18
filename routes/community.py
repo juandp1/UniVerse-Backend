@@ -5,6 +5,7 @@ from controllers.Community import (
     CommunityList,
     CreateCommunity,
     SearchCommunity,
+    CommunitySimilarName,
 )
 
 
@@ -15,3 +16,4 @@ def add_resources(api):
     api.add_resource(CommunityName, "/api/community/name/<string:name>")
     api.add_resource(CreateCommunity, "/api/community")
     api.add_resource(SearchCommunity, "/api/explore/communities/name/<string:name>")
+    api.add_resource(CommunitySimilarName, "/api/community/similar_name/<string:name>")
