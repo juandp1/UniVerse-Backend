@@ -63,7 +63,8 @@ class Documents(Resource):
             )
             try:
                 document.save_to_db()
-            except:
+            except Exception as e:
+                print(e)
                 return {"message": "An error occurred creating the document."}, 500
 
             comm_has_doc_and_topic = CommunityHasDocumentAndTopicModel(
