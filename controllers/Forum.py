@@ -125,7 +125,7 @@ class QuestionsByCommunityAndTopic(Resource):
         
         QuestionModel.change_user_id_for_user_name(questions)
 
-        return {"questions": [question.json() for question in questions]}, 200
+        return questions, 200
 
 
 class QuestionListByCommunity(Resource):
