@@ -130,7 +130,7 @@ class SearchMeetingDate(Resource):
     )
 
     @jwt_required()
-    def get(self, community_id):
+    def post(self, community_id):
         data = SearchMeetingDate.parser.parse_args()
         return {
             "communities": [
