@@ -86,8 +86,7 @@ class Documents(Resource):
             data["description"] if not data["description"] is None else "",
             blob,
             data["type"],
-            user_id,
-            user_id,
+            user_id
         )
         try:
             document.is_active = False
