@@ -64,7 +64,3 @@ class TopicModel(db.Model):
     @classmethod
     def get_name_by_id(cls, id):
         return cls.query.filter_by(id=id, is_active=True).first().name
-    
-    @classmethod
-    def get_propouse_by_com(cls):
-        return cls.query.filter_by(is_active=False).all()
