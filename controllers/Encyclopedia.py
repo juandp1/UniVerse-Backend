@@ -79,11 +79,14 @@ class Documents(Resource):
                 return {"message": "An error occurred creating the document."}, 500
             return {"message": "The document has been stored"}, 201
 
+        blob = data["file"].encode("utf-8")
+
         document = DocumentModel(
             data["name"],
-            data["description"] if data["description"] else "",
-            data["file"],
+            data["description"] if not data["description"] is None else "",
+            blob,
             data["type"],
+            user_id,
             user_id,
         )
         try:
