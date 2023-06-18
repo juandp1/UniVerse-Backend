@@ -48,38 +48,10 @@ class Documents(Resource):
         if not CommunityModel.is_member(user_id, community_id):
             return {"message": "User not member of community"}, 404
 
-        if AdministratorManageCommunityModel.user_is_admin_of_community(
-            user_id, community_id
-        ):
-            blob = data["file"].encode("utf-8")
-
-            document = DocumentModel(
-                data["name"],
-                data["description"] if not data["description"] is None else "",
-                blob,
-                data["type"],
-                user_id,
-                user_id,
-            )
-            try:
-                document.save_to_db()
-            except Exception as e:
-                print(e)
-                return {"message": "An error occurred creating the document."}, 500
-
-            comm_has_doc_and_topic = CommunityHasDocumentAndTopicModel(
-                community_id=community_id,
-                document_id=document.id,
-                topic_id=data["topic_id"],
-            )
-            try:
-                comm_has_doc_and_topic.save_to_db()
-            except Exception as e:
-                print(e)
-                return {"message": "An error occurred creating the document."}, 500
-            return {"message": "The document has been stored"}, 201
-
         blob = data["file"].encode("utf-8")
+        is_admin = AdministratorManageCommunityModel.user_is_admin_of_community(
+            user_id, community_id
+        )
 
         document = DocumentModel(
             data["name"],
@@ -87,11 +59,13 @@ class Documents(Resource):
             blob,
             data["type"],
             user_id,
+            user_id,
         )
         try:
-            document.is_active = False
+            document.is_active = is_admin  # If user is admin, document is active
             document.save_to_db()
-        except:
+        except Exception as e:
+            print(e)
             return {"message": "An error occurred creating the document."}, 500
 
         comm_has_doc_and_topic = CommunityHasDocumentAndTopicModel(
@@ -100,10 +74,14 @@ class Documents(Resource):
             topic_id=data["topic_id"],
         )
         try:
+            comm_has_doc_and_topic.is_active = (
+                is_admin  # If user is admin, relation is active
+            )
             comm_has_doc_and_topic.save_to_db()
-        except:
-            return {"message": "An error occurred creating the relation."}, 500
-        return document.json(), 201
+        except Exception as e:
+            print(e)
+            return {"message": "An error occurred creating the document."}, 500
+        return {"message": "The document has been stored"}, 201
 
 
 class DocumentsByTopic(Resource):
@@ -132,14 +110,20 @@ class DocumentsPropose(Resource):
         ):
             return {"message": "User not admin of community"}, 404
 
-        return {
-            "documents": [
-                document.json()
-                for document in CommunityHasDocumentAndTopicModel.get_propose_by_com(
-                    community_id
-                )
-            ]
-        }, 200
+        relations = CommunityHasDocumentAndTopicModel.get_propose_relations_by_comm_id(
+            community_id
+        )
+
+        documents = {}
+        for relation in relations:
+            document_id = relation.document_id
+            document = DocumentModel.find_all_type_of_document_by_id(document_id)
+            if document.is_active:
+                pass
+
+            documents[document_id] = document.json()
+
+        return {"documents": documents}, 200
 
 
 class RejectDocument(Resource):
