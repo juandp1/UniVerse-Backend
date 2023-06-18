@@ -118,13 +118,12 @@ class QuestionsByCommunityAndTopic(Resource):
         if not CommunityModel.find_by_id(community_id):
             return {"message": "Community not found"}, 404
 
-        questions = QuestionModel.find_by_community_and_topic(community_id, topic_id)
+        questions = [question.json() for question in QuestionModel.find_by_community_and_topic(community_id, topic_id)]
 
         if questions is None:
             return {"message": "Questions not found"}, 404
         
-        for question in questions:
-            QuestionModel.change_user_id_for_user_name(question)
+        QuestionModel.change_user_id_for_user_name(questions)
 
         return {"questions": [question.json() for question in questions]}, 200
 
