@@ -6,6 +6,13 @@ class CommunityHasDocumentAndTopicModel(db.Model):
     __tablename__ = "Community_has_Document_and_Topic"
 
     # Attributes
+    table_id = db.Column(
+        "id_community_has_document_and_topic",
+        db.Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+
     community_id = db.Column(
         "Community_id_community",
         db.Integer,

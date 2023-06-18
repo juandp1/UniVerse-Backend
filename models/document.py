@@ -9,7 +9,7 @@ class DocumentModel(db.Model):
     id = db.Column("id_document", db.Integer, primary_key=True)
     name = db.Column("name", db.String(60), nullable=False)
     description = db.Column("description", db.String(120), nullable=True)
-    file = db.Column("file", db.LargeBinary, nullable=False)
+    file = db.Column("file", db.LargeBinary(length=16777216), nullable=False)
     type = db.Column("type", db.String(45), nullable=False)
     user_id = db.Column("user_id", db.Integer, db.ForeignKey("User.id_user"))
     administrator_id = db.Column(
@@ -30,7 +30,7 @@ class DocumentModel(db.Model):
     )
 
     # Methods
-    def __init__(self, name, description, file, type, user_id, administrator_id):
+    def __init__(self, name, description, file, type, user_id, administrator_id=None):
         self.name = name
         self.description = description
         self.file = file

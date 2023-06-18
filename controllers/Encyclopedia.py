@@ -15,9 +15,7 @@ class Documents(Resource):
     parser.add_argument(
         "description", type=str, required=False, help="This field cannot be blank."
     )
-    parser.add_argument(
-        "file", type=str, required=True, help="This field cannot be blank."
-    )
+    parser.add_argument("file", required=True, help="This field cannot be blank.")
     parser.add_argument(
         "type", type=str, required=True, help="This field cannot be blank."
     )
@@ -53,10 +51,12 @@ class Documents(Resource):
         if AdministratorManageCommunityModel.user_is_admin_of_community(
             user_id, community_id
         ):
+            blob = data["file"].encode("utf-8")
+
             document = DocumentModel(
                 data["name"],
-                data["description"] if data["description"] else "",
-                data["file"],
+                data["description"] if not data["description"] is None else "",
+                blob,
                 data["type"],
                 user_id,
                 user_id,
@@ -73,9 +73,10 @@ class Documents(Resource):
             )
             try:
                 comm_has_doc_and_topic.save_to_db()
-            except:
+            except Exception as e:
+                print(e)
                 return {"message": "An error occurred creating the document."}, 500
-            return document.json(), 201
+            return {"message": "The document has been stored"}, 201
 
         document = DocumentModel(
             data["name"],
@@ -83,7 +84,6 @@ class Documents(Resource):
             data["file"],
             data["type"],
             user_id,
-            None,
         )
         try:
             document.is_active = False
@@ -111,9 +111,7 @@ class DocumentsByTopic(Resource):
         return {
             "documents": [
                 document.json()
-                for document in DocumentModel.query.filter_by(
-                    topic_id=topic_id, is_active=True
-                ).all()
+                for document in DocumentModel.query.filter_by(is_active=True).all()
             ]
         }, 200
 
