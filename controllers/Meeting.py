@@ -133,9 +133,9 @@ class SearchMeetingDate(Resource):
     def post(self, comm_id):
         data = SearchMeetingDate.parser.parse_args()
         return {
-            "communities": [
-                community.json()
-                for community in MeetingModel.find_by_dates(
+            "meetings": [
+                meeting.json()
+                for meeting in MeetingModel.find_by_dates(
                     comm_id, data["initial_date"], data["final_date"]
                 )
             ]
