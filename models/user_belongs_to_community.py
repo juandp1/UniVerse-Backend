@@ -70,14 +70,18 @@ class UserBelongsToCommunityModel(db.Model):
         cls,
     ):
         res_query = cls.query.filter_by(is_active=True).all()
-        res = {}
-        for each in res_query:
-            id_com = each.community_id
-            if id_com not in res:
-                res[id_com] = 1
-            else:
-                res[id_com] += 1
-        return res
+        try:
+            res = {}
+            for each in res_query:
+                id_com = each.community_id
+                if id_com not in res:
+                    res[id_com] = 1
+                else:
+                    res[id_com] += 1
+            return res
+        catch Exception as e:
+            print(e)
+            return {}, 500
 
     @classmethod
     def num_of_users_per_community_id(cls, community_id):
