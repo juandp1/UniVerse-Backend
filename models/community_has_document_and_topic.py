@@ -83,7 +83,11 @@ class CommunityHasDocumentAndTopicModel(db.Model):
 
     @classmethod
     def find_topics_of_community(cls, community_id):
-        return cls.query.filter_by(community_id=community_id, is_active=True).all()
+        return (
+            cls.query.filter_by(community_id=community_id, is_active=True)
+            .group_by(cls.topic_id)
+            .all()
+        )
 
     @classmethod
     def num_of_topics_per_community(cls, community_id):
