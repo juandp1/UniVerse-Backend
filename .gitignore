@@ -303,3 +303,7 @@ mysql-data/*
 
 .idea
 .idea/*
+
+# SSL CA
+config/ssl/*
+config/ssl/
