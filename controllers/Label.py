@@ -4,7 +4,6 @@ from models.label import LabelModel
 
 
 class LabelList(Resource):
-    @jwt_required
     def get(self):
-        labels = LabelModel.find_all()
-        return {"labels": [label.json() for label in labels]}, 200
+        labels_res = LabelModel.find_all()
+        return {"labels": [label.json() for label in labels_res]}, 200
