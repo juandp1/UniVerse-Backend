@@ -41,5 +41,9 @@ class LabelModel(db.Model):
         db.session.commit()
 
     @classmethod
+    def find_all(cls):
+        return cls.query.filter_by(is_active=True).all()
+
+    @classmethod
     def find_by_name(cls, name):
         return cls.query.filter_by(name=name, is_active=True).first()
