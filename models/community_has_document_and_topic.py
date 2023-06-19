@@ -92,3 +92,15 @@ class CommunityHasDocumentAndTopicModel(db.Model):
     @classmethod
     def get_propose_relations_by_comm_id(cls, community_id):
         return cls.query.filter_by(community_id=community_id, is_active=False).all()
+
+    @classmethod
+    def accept_document(cls, document_id):
+        cls.query.filter_by(document_id=document_id, is_active=False).update(
+            {"is_active": True}
+        )
+        db.session.commit()
+
+    @classmethod
+    def reject_document(cls, document_id):
+        cls.query.filter_by(document_id=document_id, is_active=False).delete()
+        db.session.commit()

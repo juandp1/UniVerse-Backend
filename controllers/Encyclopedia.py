@@ -140,18 +140,23 @@ class RejectDocument(Resource):
 
         if not CommunityModel.find_by_id(community_id):
             return {"message": "Community not found"}, 404
-        if not CommunityModel.find_by_id(community_id).is_member(user_id):
+        if not CommunityModel.is_member(user_id, community_id):
             return {"message": "User not member of community"}, 404
         if not AdministratorManageCommunityModel.user_is_admin_of_community(
             user_id, community_id
         ):
             return {"message": "User not admin of community"}, 404
 
-        document = DocumentModel.find_by_id(data["document_id"])
+        document = DocumentModel.find_all_type_of_document_by_id(data["document_id"])
         if not document:
             return {"message": "Document not found"}, 404
 
-        document.delete_from_db()
+        try:
+            document.delete_from_db()
+            CommunityHasDocumentAndTopicModel.reject_document(data["document_id"])
+        except Exception as e:
+            print(e)
+            return {"message": "An error occurred deleting the document."}, 500
         return {"message": "Document deleted"}, 200
 
 
@@ -169,17 +174,24 @@ class AcceptDocument(Resource):
 
         if not CommunityModel.find_by_id(community_id):
             return {"message": "Community not found"}, 404
-        if not CommunityModel.find_by_id(community_id).is_member(user_id):
+        if not CommunityModel.is_member(user_id, community_id):
             return {"message": "User not member of community"}, 404
         if not AdministratorManageCommunityModel.user_is_admin_of_community(
             user_id, community_id
         ):
             return {"message": "User not admin of community"}, 404
 
-        document = DocumentModel.find_by_id(data["document_id"])
+        document = DocumentModel.find_all_type_of_document_by_id(data["document_id"])
         if not document:
             return {"message": "Document not found"}, 404
 
         document.is_active = True
-        document.save_to_db()
+
+        try:
+            CommunityHasDocumentAndTopicModel.accept_document(data["document_id"])
+            document.save_to_db()
+        except Exception as e:
+            print(e)
+            return {"message": "An error occurred accepting the document."}, 500
+
         return document.json(), 200
