@@ -53,6 +53,12 @@ class CommunityModel(db.Model):
         return cls.query.filter_by(name=name, is_active=True).first()
 
     @classmethod
+    def find_by_similar_name(cls, name):
+        return cls.query.filter(
+            cls.name.like("%" + name + "%"), cls.is_active == True
+        ).all()
+
+    @classmethod
     def is_member(cls, id_user, id_community):
         return (
             UserBelongsToCommunityModel.query.filter_by(

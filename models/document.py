@@ -87,3 +87,7 @@ class DocumentModel(db.Model):
             cls.created_at < datetime.datetime.utcnow() - datetime.timedelta(days=15),
         ).delete()
         db.session.commit()
+
+    @classmethod
+    def find_all_type_of_document_by_id(cls, id):
+        return cls.query.filter_by(id=id).first()

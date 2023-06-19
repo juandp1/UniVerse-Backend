@@ -48,47 +48,23 @@ class Documents(Resource):
         if not CommunityModel.is_member(user_id, community_id):
             return {"message": "User not member of community"}, 404
 
-        if AdministratorManageCommunityModel.user_is_admin_of_community(
+        blob = data["file"].encode("utf-8")
+        is_admin = AdministratorManageCommunityModel.user_is_admin_of_community(
             user_id, community_id
-        ):
-            blob = data["file"].encode("utf-8")
-
-            document = DocumentModel(
-                data["name"],
-                data["description"] if not data["description"] is None else "",
-                blob,
-                data["type"],
-                user_id,
-                user_id,
-            )
-            try:
-                document.save_to_db()
-            except:
-                return {"message": "An error occurred creating the document."}, 500
-
-            comm_has_doc_and_topic = CommunityHasDocumentAndTopicModel(
-                community_id=community_id,
-                document_id=document.id,
-                topic_id=data["topic_id"],
-            )
-            try:
-                comm_has_doc_and_topic.save_to_db()
-            except Exception as e:
-                print(e)
-                return {"message": "An error occurred creating the document."}, 500
-            return {"message": "The document has been stored"}, 201
+        )
 
         document = DocumentModel(
             data["name"],
-            data["description"] if data["description"] else "",
-            data["file"],
+            data["description"] if not data["description"] is None else "",
+            blob,
             data["type"],
             user_id,
         )
         try:
-            document.is_active = False
+            document.is_active = is_admin  # If user is admin, document is active
             document.save_to_db()
-        except:
+        except Exception as e:
+            print(e)
             return {"message": "An error occurred creating the document."}, 500
 
         comm_has_doc_and_topic = CommunityHasDocumentAndTopicModel(
@@ -97,10 +73,14 @@ class Documents(Resource):
             topic_id=data["topic_id"],
         )
         try:
+            comm_has_doc_and_topic.is_active = (
+                is_admin  # If user is admin, relation is active
+            )
             comm_has_doc_and_topic.save_to_db()
-        except:
-            return {"message": "An error occurred creating the relation."}, 500
-        return document.json(), 201
+        except Exception as e:
+            print(e)
+            return {"message": "An error occurred creating the document."}, 500
+        return {"message": "The document has been stored"}, 201
 
 
 class DocumentsByTopic(Resource):
@@ -114,6 +94,35 @@ class DocumentsByTopic(Resource):
                 for document in DocumentModel.query.filter_by(is_active=True).all()
             ]
         }, 200
+
+
+class DocumentsPropose(Resource):
+    @jwt_required()
+    def get(self, community_id):
+        jwt_user = get_jwt_identity()
+        user_id = jwt_user["id"]
+
+        if not CommunityModel.find_by_id(community_id):
+            return {"message": "Community not found"}, 404
+        if not AdministratorManageCommunityModel.user_is_admin_of_community(
+            user_id, community_id
+        ):
+            return {"message": "User not admin of community"}, 404
+
+        relations = CommunityHasDocumentAndTopicModel.get_propose_relations_by_comm_id(
+            community_id
+        )
+
+        documents = []
+        for relation in relations:
+            document_id = relation.document_id
+            document = DocumentModel.find_all_type_of_document_by_id(document_id)
+            if document.is_active:
+                pass
+
+            documents.append(document.json())
+
+        return {"documents": documents}, 200
 
 
 class RejectDocument(Resource):
@@ -130,18 +139,23 @@ class RejectDocument(Resource):
 
         if not CommunityModel.find_by_id(community_id):
             return {"message": "Community not found"}, 404
-        if not CommunityModel.find_by_id(community_id).is_member(user_id):
+        if not CommunityModel.is_member(user_id, community_id):
             return {"message": "User not member of community"}, 404
         if not AdministratorManageCommunityModel.user_is_admin_of_community(
             user_id, community_id
         ):
             return {"message": "User not admin of community"}, 404
 
-        document = DocumentModel.find_by_id(data["document_id"])
+        document = DocumentModel.find_all_type_of_document_by_id(data["document_id"])
         if not document:
             return {"message": "Document not found"}, 404
 
-        document.delete_from_db()
+        try:
+            document.delete_from_db()
+            CommunityHasDocumentAndTopicModel.reject_document(data["document_id"])
+        except Exception as e:
+            print(e)
+            return {"message": "An error occurred deleting the document."}, 500
         return {"message": "Document deleted"}, 200
 
 
@@ -159,17 +173,52 @@ class AcceptDocument(Resource):
 
         if not CommunityModel.find_by_id(community_id):
             return {"message": "Community not found"}, 404
-        if not CommunityModel.find_by_id(community_id).is_member(user_id):
+        if not CommunityModel.is_member(user_id, community_id):
             return {"message": "User not member of community"}, 404
         if not AdministratorManageCommunityModel.user_is_admin_of_community(
             user_id, community_id
         ):
             return {"message": "User not admin of community"}, 404
 
-        document = DocumentModel.find_by_id(data["document_id"])
+        document = DocumentModel.find_all_type_of_document_by_id(data["document_id"])
         if not document:
             return {"message": "Document not found"}, 404
 
         document.is_active = True
-        document.save_to_db()
+
+        try:
+            CommunityHasDocumentAndTopicModel.accept_document(data["document_id"])
+            document.save_to_db()
+        except Exception as e:
+            print(e)
+            return {"message": "An error occurred accepting the document."}, 500
+
         return document.json(), 200
+
+
+class DeleteDocument(Resource):
+    @jwt_required()
+    def delete(self, community_id, document_id):
+        jwt_user = get_jwt_identity()
+        user_id = jwt_user["id"]
+
+        if not CommunityModel.find_by_id(community_id):
+            return {"message": "Community not found"}, 404
+        if not CommunityModel.is_member(user_id, community_id):
+            return {"message": "User not member of community"}, 404
+        is_admin = AdministratorManageCommunityModel.user_is_admin_of_community(
+            user_id, community_id
+        )
+        if not is_admin:
+            return {"message": "User not admin of community"}, 404
+
+        document = DocumentModel.find_all_type_of_document_by_id(document_id)
+        if not document:
+            return {"message": "Document not found"}, 404
+
+        try:
+            document.delete_from_db()
+            return {"message": "Document deleted."}, 200
+        except Exception as e:
+            print(e)
+            return {"message": "An error occurred deleting the document."}, 500

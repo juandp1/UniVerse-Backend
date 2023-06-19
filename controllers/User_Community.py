@@ -66,9 +66,12 @@ class UserLeaveCommunity(Resource):
 
         if not CommunityModel.find_by_id(data["community_id"]):
             return {"message": "Community not found"}, 404
-
         if not UserModel.find_by_id(data["user_id"]):
             return {"message": "User not found"}, 404
+        if AdministratorManageCommunityModel.user_is_admin_of_community(
+            user_id, data["community_id"]
+        ):
+            return {"message": "Admin cannot leave community"}, 400
 
         user_belongs_to_community = (
             UserBelongsToCommunityModel.find_by_user_id_and_community_id(

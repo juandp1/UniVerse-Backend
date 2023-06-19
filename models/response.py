@@ -75,7 +75,7 @@ class ResponseModel(db.Model):
 
     @classmethod
     def find_by_id(cls, id):
-        return cls.query.filter_by(id=id, is_active=True).first()
+        return cls.query.filter_by(num_response=id, is_active=True).first()
 
     @classmethod
     def find_more_voted(cls):
