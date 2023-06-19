@@ -59,7 +59,6 @@ class Documents(Resource):
             blob,
             data["type"],
             user_id,
-            user_id,
         )
         try:
             document.is_active = is_admin  # If user is admin, document is active
