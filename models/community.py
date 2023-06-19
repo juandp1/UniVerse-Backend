@@ -54,9 +54,8 @@ class CommunityModel(db.Model):
 
     @classmethod
     def find_by_similar_name(cls, name):
-        # return cls.query.filter_by(name.like("%" + name + "%"), is_active=True).all()
-        return cls.query.filter_by(
-            cls.name.match("%" + name + "%"), is_active=True
+        return cls.query.filter(
+            cls.name.like("%" + name + "%"), cls.is_active == True
         ).all()
 
     @classmethod
