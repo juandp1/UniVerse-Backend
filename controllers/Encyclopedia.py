@@ -195,3 +195,31 @@ class AcceptDocument(Resource):
             return {"message": "An error occurred accepting the document."}, 500
 
         return document.json(), 200
+
+
+class DeleteDocument(Resource):
+    @jwt_required()
+    def delete(self, community_id, document_id):
+        jwt_user = get_jwt_identity()
+        user_id = jwt_user["id"]
+
+        if not CommunityModel.find_by_id(community_id):
+            return {"message": "Community not found"}, 404
+        if not CommunityModel.is_member(user_id, community_id):
+            return {"message": "User not member of community"}, 404
+        is_admin = AdministratorManageCommunityModel.user_is_admin_of_community(
+            user_id, community_id
+        )
+        if not is_admin:
+            return {"message": "User not admin of community"}, 404
+
+        document = DocumentModel.find_all_type_of_document_by_id(document_id)
+        if not document:
+            return {"message": "Document not found"}, 404
+
+        try:
+            document.delete_from_db()
+            return {"message": "Document deleted."}, 200
+        except Exception as e:
+            print(e)
+            return {"message": "An error occurred deleting the document."}, 500

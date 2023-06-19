@@ -5,6 +5,7 @@ from controllers.Encyclopedia import (
     RejectDocument,
     DocumentsByTopic,
     DocumentsPropose,
+    DeleteDocument,
 )
 
 
@@ -18,3 +19,7 @@ def add_resources(api):
         AcceptDocument, "/api/community/<int:community_id>/accept_document"
     )
     api.add_resource(DocumentsPropose, "/api/community/<int:community_id>/propose")
+    api.add_resource(
+        DeleteDocument,
+        "/api/community/<int:community_id>/delete_document/<int:document_id>",
+    )
