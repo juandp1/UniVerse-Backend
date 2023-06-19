@@ -114,14 +114,14 @@ class DocumentsPropose(Resource):
             community_id
         )
 
-        documents = {}
+        documents = []
         for relation in relations:
             document_id = relation.document_id
             document = DocumentModel.find_all_type_of_document_by_id(document_id)
             if document.is_active:
                 pass
 
-            documents[document_id] = document.json()
+            documents.append(document.json())
 
         return {"documents": documents}, 200
 
