@@ -2,6 +2,7 @@ from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required
 from models.question import QuestionModel
 from models.label import LabelModel
+from models.community import CommunityModel
 from models.label_has_community import LabelHasCommunityModel
 from models.user_belongs_to_community import UserBelongsToCommunityModel
 from models.community_has_document_and_topic import CommunityHasDocumentAndTopicModel
@@ -38,7 +39,14 @@ class TopicsPerCommunity(Resource):
 class ListUsersPerComm(Resource):
     @jwt_required()
     def get(self):
-        return UserBelongsToCommunityModel.num_of_users_per_community()
+        res = UserBelongsToCommunityModel.num_of_users_per_community()
+        data = {}
+
+        for key, value in res.items():
+            comm = CommunityModel.find_by_id(key)
+            if comm:
+                data[comm.name] = value
+        return data
 
 
 class CommunitiesPerLabel(Resource):
