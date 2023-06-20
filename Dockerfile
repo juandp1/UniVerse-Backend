@@ -11,6 +11,8 @@ ENV SERVER /home/universe_backend
 RUN mkdir -p $SERVER
 WORKDIR $SERVER
 
+EXPOSE 3333
+
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
