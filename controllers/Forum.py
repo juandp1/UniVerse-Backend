@@ -118,11 +118,16 @@ class QuestionsByCommunityAndTopic(Resource):
         if not CommunityModel.find_by_id(community_id):
             return {"message": "Community not found"}, 404
 
-        questions = [question.json() for question in QuestionModel.find_by_community_and_topic(community_id, topic_id)]
+        questions = [
+            question.json()
+            for question in QuestionModel.find_by_community_and_topic(
+                community_id, topic_id
+            )
+        ]
 
         if questions is None:
             return {"message": "Questions not found"}, 404
-        
+
         QuestionModel.change_user_id_for_user_name(questions)
 
         return {"questions": questions}, 200
@@ -169,8 +174,8 @@ class QuestionListByTopic(Resource):
 
 class MostRecentQuestion(Resource):
     @jwt_required()
-    def get(self):
-        question = QuestionModel.find_more_recent()
+    def get(self, community_id):
+        question = QuestionModel.find_more_recent(community_id)
         if question is None:
             return {"message": "Question not found"}, 404
 
@@ -213,12 +218,16 @@ class QuestionVoted(Resource):
 
 class MostVotedQuestion(Resource):
     @jwt_required()
-    def get(self):
-        response = ResponseModel.find_more_voted()
-        if response is None:
+    def get(self, community_id):
+        responses = ResponseModel.find_more_voted()
+        if responses is None:
             return {"message": "Question not found"}, 404
 
-        return response.json(), 200
+        for response in responses:
+            question = QuestionModel.find_by_id(response.question_id)
+            if question.community_id == community_id:
+                return response.json(), 200
+        return {}, 200
 
 
 class ResponseVoted(Resource):

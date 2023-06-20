@@ -80,9 +80,11 @@ class QuestionModel(db.Model):
         return cls.query.filter_by(is_active=True).all()
 
     @classmethod
-    def find_more_recent(cls):
+    def find_more_recent(cls, community_id):
         return (
-            cls.query.filter_by(is_active=True).order_by(cls.created_at.desc()).first()
+            cls.query.filter_by(community_id=community_id, is_active=True)
+            .order_by(cls.created_at.desc())
+            .first()
         )
 
     @classmethod
@@ -96,16 +98,16 @@ class QuestionModel(db.Model):
         return cls.query.filter_by(community_id=community_id, is_active=True).all()
 
     @classmethod
-    def change_user_id_for_user_name(cls,questions):
+    def change_user_id_for_user_name(cls, questions):
         for question in questions:
             user = UserModel.find_by_id(question["user_id"])
-            
+
             if user is None:
                 return {"message": "User not found"}, 404
-            
+
             name = user.name
             del question["user_id"]
-            question["user_name"] = name    
+            question["user_name"] = name
         return questions
 
     @classmethod

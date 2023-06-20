@@ -79,4 +79,4 @@ class ResponseModel(db.Model):
 
     @classmethod
     def find_more_voted(cls):
-        return cls.query.filter_by(is_active=True).order_by(cls.score.desc()).first()
+        return cls.query.filter_by(is_active=True).order_by(cls.score.desc()).all()
