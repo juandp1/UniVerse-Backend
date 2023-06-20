@@ -93,7 +93,7 @@ class MeetingModel(db.Model):
         return (
             cls.query.filter_by(is_active=True)
             .filter(cls.community_id == comm_id)
-            .filter(cls.date >= datetime.datetime.utcnow())
+            .filter(cls.date >= datetime.datetime.now())
             .order_by(cls.date.asc())
             .first()
         )
