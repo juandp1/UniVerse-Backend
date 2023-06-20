@@ -104,3 +104,11 @@ class CommunityHasDocumentAndTopicModel(db.Model):
     def reject_document(cls, document_id):
         cls.query.filter_by(document_id=document_id, is_active=False).delete()
         db.session.commit()
+
+    @classmethod
+    def is_topic_part_of_community(cls, topic_id, community_id):
+        return (
+            cls.query.filter_by(
+                topic_id=topic_id, community_id=community_id, is_active=True
+            ).first()
+        ) is not None

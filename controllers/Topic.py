@@ -19,13 +19,19 @@ class TopicList(Resource):
 
 class MostRecentTopic(Resource):
     @jwt_required()
-    def get(self):
-        return {
-            "communities": [
-                topic.json()
-                for topic in TopicModel.query.filter_by(is_active=True).all()
-            ]
-        }, 200
+    def get(self, community_id):
+        topics = (
+            TopicModel.query.filter_by(is_active=True)
+            .order_by(TopicModel.created_at.desc())
+            .all()
+        )
+
+        for topic in topics:
+            if CommunityHasDocumentAndTopicModel.is_topic_part_of_community(
+                topic.id, community_id
+            ):
+                return topic.json(), 200
+        return {"message": "Topic not found"}, 404
 
 
 class TopicId(Resource):
