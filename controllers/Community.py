@@ -166,6 +166,8 @@ class CreateCommunity(Resource):
 
         if data["name"] == "":
             return {"message": "Name cannot be empty"}, 400
+        if data["description"] == "":
+            return {"message": "Description cannot be empty"}, 400
 
         existing_community = CommunityModel.find_by_name(data["name"])
         if existing_community:
