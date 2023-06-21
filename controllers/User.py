@@ -49,6 +49,16 @@ class User(Resource):
             and UserModel.is_valid_email(data["email"])
         ):
             return {"message": "A user with that email already exists"}, 400
+        existing_user = UserModel.query.filter_by(
+            name=data["name"], is_active=True
+        ).one_or_none()
+        if existing_user is not None and existing_user.id != id:
+            return {"message": "A user with that name already exists"}, 400
+
+        if data["password"] == "" or len(data["password"]) < 8:
+            return {"message": "Password must be at least 8 characters"}, 400
+        if data["name"] == "" or data["email"] == "":
+            return {"message": "Name and email cannot be empty"}, 400
 
         user = UserModel.find_by_id(id)
         if user is None:
@@ -107,11 +117,21 @@ class UserRegister(Resource):
 
     def post(self):
         data = UserRegister.parser.parse_args()
+
         existing_user = UserModel.query.filter_by(
             email=data["email"], is_active=True
         ).one_or_none()
-        if existing_user:
+        if (
+            existing_user is not None
+            and existing_user.id != id
+            and UserModel.is_valid_email(data["email"])
+        ):
             return {"message": "A user with that email already exists"}, 400
+        existing_user = UserModel.query.filter_by(
+            name=data["name"], is_active=True
+        ).one_or_none()
+        if existing_user is not None and existing_user.id != id:
+            return {"message": "A user with that name already exists"}, 400
 
         if not UserModel.is_valid_email(data["email"]):
             return {"message": "Invalid email format"}, 400
@@ -156,7 +176,9 @@ class UserLogin(Resource):
         if not email and not name:
             return {"message": "Invalid credentials"}, 401
 
-        user_email = UserModel.query.filter_by(email=email, is_active=True).one_or_none()
+        user_email = UserModel.query.filter_by(
+            email=email, is_active=True
+        ).one_or_none()
         user_name = UserModel.query.filter_by(name=name, is_active=True).one_or_none()
 
         if user_email is None and user_name is None:
