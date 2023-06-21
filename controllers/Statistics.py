@@ -50,19 +50,14 @@ class ListUsersPerComm(Resource):
 
 
 class CommunitiesPerLabel(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument(
-        "label", type=str, required=True, help="This field cannot be blank."
-    )
-
     @jwt_required()
     def get(self):
-        data = CommunitiesPerLabel.parser.parse_args()
-        label = LabelModel.find_by_name(data["label"])
-        if label:
-            return {
-                "communities": LabelHasCommunityModel.num_of_communities_per_label(
-                    label.id
-                )
-            }
-        return {"message": "That label doesn't exist"}, 400
+        labels = LabelModel.query.filter_by(is_active=True).all()
+        data = {}
+
+        for label in labels:
+            data[label.name] = LabelHasCommunityModel.num_of_communities_per_label(
+                label.id
+            )
+
+        return data
