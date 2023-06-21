@@ -179,7 +179,15 @@ class MostRecentQuestion(Resource):
         if question is None:
             return {"message": "Question not found"}, 404
 
-        return question.json(), 200
+        data = question.json()
+        UserModel.find_by_id(data["user_id"])
+        if data["user_id"] is None:
+            return {"message": "User not found"}, 404
+
+        data["user_name"] = UserModel.find_by_id(data["user_id"]).name
+        del data["user_id"]
+
+        return data, 200
 
 
 class QuestionVoted(Resource):
