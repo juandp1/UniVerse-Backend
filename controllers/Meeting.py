@@ -115,6 +115,10 @@ class MeetingId(Resource):
         if current_user["id"] != meeting.user_id:
             return {"message": "Not found"}, 404
 
+        # Check if the date is valid
+        if datetime.strptime(data["date"], "%Y-%m-%d %H:%M:%S") < datetime.now():
+            return {"message": "Invalid date"}, 400
+
         meeting.name = data["name"]
         meeting.description = data["description"]
         meeting.place = data["place"]
