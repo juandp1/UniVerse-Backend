@@ -134,11 +134,18 @@ class TopicListByCommunity(Resource):
         if not CommunityModel.find_by_id(community_id):
             return {"message": "Community not found"}, 404
 
-        topics = CommunityHasDocumentAndTopicModel.find_topics_of_community(
+        raw_topics = CommunityHasDocumentAndTopicModel.find_topics_of_community(
             community_id=community_id
         )
-        if topics is None:
+        if raw_topics is None:
             return {"message": "Topics not found"}, 404
+
+        added_ids = []
+        topics = []
+        for topic in raw_topics:
+            if topic.topic_id not in added_ids:
+                topics.append(topic)
+                added_ids.append(topic.topic_id)
 
         temp_dict = {"topics": [topic.json() for topic in topics]}
         for item in temp_dict["topics"]:
