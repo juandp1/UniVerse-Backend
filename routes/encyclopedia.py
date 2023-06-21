@@ -6,11 +6,16 @@ from controllers.Encyclopedia import (
     DocumentsByTopic,
     DocumentsPropose,
     DeleteDocument,
+    DocumentsByTopicAndCommunityId,
 )
 
 
 def add_resources(api):
     api.add_resource(Documents, "/api/community/<int:community_id>/documents")
+    api.add_resource(
+        DocumentsByTopicAndCommunityId,
+        "/api/community/<int:community_id>/documents/<int:topic_id>",
+    )
     api.add_resource(DocumentsByTopic, "/api/topic/<int:topic_id>/documents")
     api.add_resource(
         RejectDocument, "/api/community/<int:community_id>/reject_document"

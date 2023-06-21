@@ -112,3 +112,25 @@ class CommunityHasDocumentAndTopicModel(db.Model):
                 topic_id=topic_id, community_id=community_id, is_active=True
             ).first()
         ) is not None
+
+    @classmethod
+    def get_documents_by_topic_id(cls, topic_id):
+        response = cls.query.filter_by(topic_id=topic_id, is_active=True).all()
+        data = []
+
+        for item in response:
+            if item.document_id is not None:
+                data.append(item.document_id)
+        return data
+
+    @classmethod
+    def get_documents_by_topic_id_and_community_id(cls, topic_id, community_id):
+        response = cls.query.filter_by(
+            topic_id=topic_id, community_id=community_id, is_active=True
+        ).all()
+
+        all_documents_references = []
+        for item in response:
+            if item.document_id is not None:
+                all_documents_references.append(item.document_id)
+        return all_documents_references
