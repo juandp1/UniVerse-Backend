@@ -78,7 +78,6 @@ class CommunityName(Resource):
         if community:
             return community.json()
         return {"message": "Community not found"}, 404
-    
 
     @jwt_required()
     def delete(self, name):
@@ -126,6 +125,7 @@ class CommunityName(Resource):
         except:
             return {"message": "An error occurred updating the community."}, 500
 
+
 class CommunitySimilarName(Resource):
     @jwt_required()
     def get(self, name):
@@ -135,6 +135,7 @@ class CommunitySimilarName(Resource):
                 for community in CommunityModel.find_by_similar_name(name)
             ]
         }, 200
+
 
 class CommunityList(Resource):
     @jwt_required()
@@ -162,6 +163,9 @@ class CreateCommunity(Resource):
     @jwt_required()
     def post(self):
         data = CreateCommunity.parser.parse_args()
+
+        if data["name"] == "":
+            return {"message": "Name cannot be empty"}, 400
 
         existing_community = CommunityModel.find_by_name(data["name"])
         if existing_community:
