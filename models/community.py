@@ -8,8 +8,8 @@ class CommunityModel(db.Model):
 
     # Attributes
     id = db.Column("id_community", db.Integer, primary_key=True)
-    name = db.Column("name", db.String(60), nullable=False, unique=True)
-    description = db.Column("description", db.String(120), nullable=True)
+    name = db.Column("name", db.String(255), nullable=False, unique=True)
+    description = db.Column("description", db.String(255), nullable=True)
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
     created_at = db.Column(
         "created_at", db.DateTime, nullable=False, default=datetime.datetime.utcnow
