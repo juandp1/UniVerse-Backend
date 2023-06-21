@@ -91,9 +91,30 @@ class DocumentsByTopic(Resource):
         return {
             "documents": [
                 document.json()
-                for document in DocumentModel.query.filter_by(is_active=True).all()
+                for document in CommunityHasDocumentAndTopicModel.get_documents_by_topic_id(
+                    topic_id=topic_id
+                )
             ]
         }, 200
+
+
+class DocumentsByTopicAndCommunityId(Resource):
+    @jwt_required()
+    def get(self, topic_id, community_id):
+        if not TopicModel.find_by_id(topic_id):
+            return {"message": "Topic not found"}, 404
+
+        documents_ids = CommunityHasDocumentAndTopicModel.get_documents_by_topic_id_and_community_id(
+            topic_id=topic_id, community_id=community_id
+        )
+        documents = []
+
+        for document_id in documents_ids:
+            document = DocumentModel.find_all_type_of_document_by_id(document_id)
+            if document.is_active:
+                documents.append(document)
+
+        return {"documents": [document.json() for document in documents]}, 200
 
 
 class DocumentsPropose(Resource):
