@@ -2,6 +2,9 @@ import re
 import datetime
 from config.server_conf import db
 from werkzeug.security import check_password_hash
+import os 
+import base64
+import onetimepass
 
 
 class UserModel(db.Model):
@@ -12,6 +15,7 @@ class UserModel(db.Model):
     email = db.Column("email", db.String(100), nullable=False, unique=True)
     name = db.Column("name", db.String(100), nullable=False, unique=True)
     password = db.Column("password", db.String(255), nullable=False)
+    otp_secret = db.Column("otp_secret", db.String(16), nullable=False)
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
     created_at = db.Column(
         "created_at", db.DateTime, nullable=False, default=datetime.datetime.utcnow
@@ -28,6 +32,7 @@ class UserModel(db.Model):
         self.email = email
         self.name = name
         self.password = password
+        self.otp_secret = base64.b32encode(os.urandom(10)).decode("utf-8")
 
     def json(self):
         return {
@@ -35,6 +40,12 @@ class UserModel(db.Model):
             "email": self.email,
             "name": self.name,
         }
+    
+    def get_totp_uri(self):
+        return f"otpauth://totp/{self.email}?secret={self.otp_secret}&issuer=Flask"
+    
+    def verify_totp(self, token):
+        return onetimepass.valid_totp(token, self.otp_secret)
 
     def check_password(self, password):
         return check_password_hash(self.password, password)

@@ -10,6 +10,7 @@ from routes.topic import add_resources as add_topic_resources
 from routes.user import add_resources as add_user_resources
 
 
+
 def start_routes(api):
     add_auth_resources(api)
     add_community_resources(api)
