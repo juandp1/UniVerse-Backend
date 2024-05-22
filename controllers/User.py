@@ -150,7 +150,13 @@ class UserRegister(Resource):
         user.password = generate_password_hash(data["password"], method="pbkdf2")
         try:
             user.save_to_db()
-            return user.json(), 201
+            access_token = create_access_token(identity=user.json())
+            refresh_token = create_refresh_token(identity=user.json())
+            return {
+                "user": user.json(),
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+            }, 200
         except:
             return {"message": "An error occurred creating the user."}, 500
 
@@ -164,6 +170,9 @@ class UserLogin(Resource):
         "email", type=str, required=False, help="This field cannot be blank."
     )
     parser.add_argument(
+        "token", type=str, required=True, help="This field cannot be blank."
+    )
+    parser.add_argument(
         "password", type=str, required=True, help="This field cannot be blank."
     )
 
@@ -172,6 +181,7 @@ class UserLogin(Resource):
         email = data["email"]
         name = data["name"]
         password = data["password"]
+        token = data["token"]
 
         if not email and not name:
             return {"message": "Invalid credentials"}, 401
@@ -185,7 +195,7 @@ class UserLogin(Resource):
             return {"message": "Invalid credentials"}, 401
 
         user = user_email if user_email is not None else user_name
-        if not user or not user.check_password(password):
+        if not user or not user.check_password(password) or not user.verify_totp(token):
             return {"message": "Invalid credentials"}, 401
 
         access_token = create_access_token(identity=user.json())
@@ -217,3 +227,14 @@ class UserLogout(Resource):
             return {"message": "Successfully logged out"}, 200
         except:
             return {"message": "An error occurred logging out"}, 500
+
+
+
+class User2FA(Resource):
+    @jwt_required(verify_type=False)
+    def get(self):
+        user = UserModel.find_by_id(get_jwt_identity()["id"])
+        if user is None:
+            return {"message": "User not found"}, 404
+
+        return {"uri": user.get_totp_uri()}, 200
