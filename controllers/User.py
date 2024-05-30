@@ -23,6 +23,9 @@ class User(Resource):
     parser.add_argument(
         "password", type=str, required=True, help="This field cannot be blank."
     )
+    parser.add_argument(
+        "token_2fa", type=str
+    )
 
     @jwt_required()
     def get(self, id):
@@ -33,39 +36,30 @@ class User(Resource):
         return {"message": "User not found"}, 404
 
     @jwt_required()
-    def put(self, id):
+    def post(self, id):
         current_user = get_jwt_identity()
         if current_user["id"] != id:
             return {"message": "Not found"}, 404
 
         data = User.parser.parse_args()
 
-        existing_user = UserModel.query.filter_by(
+        user_email = UserModel.query.filter_by(
             email=data["email"], is_active=True
         ).one_or_none()
-        if (
-            existing_user is not None
-            and existing_user.id != id
-            and UserModel.is_valid_email(data["email"])
-        ):
-            return {"message": "A user with that email already exists"}, 400
-        existing_user = UserModel.query.filter_by(
-            name=data["name"], is_active=True
-        ).one_or_none()
-        if existing_user is not None and existing_user.id != id:
-            return {"message": "A user with that name already exists"}, 400
+        user_name = UserModel.query.filter_by(name=data["email"], is_active=True).one_or_none()
+
+        user = user_email if user_email is not None else user_name
+
+        if not user.verify_totp(data["token_2fa"]):
+            return {"message": "Invalid 2FA token"}, 401
 
         if data["password"] == "" or len(data["password"]) < 8:
             return {"message": "Password must be at least 8 characters"}, 400
-        if data["name"] == "" or data["email"] == "":
-            return {"message": "Name and email cannot be empty"}, 400
 
         user = UserModel.find_by_id(id)
         if user is None:
             user = UserModel(**data)
         else:
-            user.name = data["name"]
-            user.email = data["email"]
             user.password = generate_password_hash(data["password"], method="pbkdf2")
 
         try:
