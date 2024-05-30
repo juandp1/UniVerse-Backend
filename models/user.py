@@ -1,10 +1,10 @@
 import re
 import datetime
 from config.server_conf import db
-from werkzeug.security import check_password_hash
-import os 
-import base64
-import onetimepass
+from os import urandom 
+from base64 import b32encode
+from onetimepass import valid_totp
+import utils.encryption as encryption
 
 
 class UserModel(db.Model):
@@ -13,8 +13,11 @@ class UserModel(db.Model):
     # Attributes
     id = db.Column("id_user", db.Integer, primary_key=True)
     email = db.Column("email", db.String(100), nullable=False, unique=True)
+    email_hash = db.Column("email_hash", db.String(100), nullable=False, unique=True)
     name = db.Column("name", db.String(100), nullable=False, unique=True)
+    name_hash = db.Column("name_hash", db.String(100), nullable=False, unique=True)
     password = db.Column("password", db.String(255), nullable=False)
+    salt = db.Column("salt", db.String(255), nullable=False)
     otp_secret = db.Column("otp_secret", db.String(16), nullable=False)
     is_active = db.Column("is_active", db.Boolean, nullable=False, default=True)
     created_at = db.Column(
@@ -32,7 +35,16 @@ class UserModel(db.Model):
         self.email = email
         self.name = name
         self.password = password
-        self.otp_secret = base64.b32encode(os.urandom(10)).decode("utf-8")
+        self.otp_secret = b32encode(urandom(10)).decode("utf-8")
+
+    def jsonP(self):
+        self.name = encryption.decrypt_data(self.name)
+        self.email = encryption.decrypt_data(self.email)
+        return {
+            "id": self.id,
+            "email": self.email,
+            "name": self.name,
+        }
 
     def json(self):
         return {
@@ -45,13 +57,20 @@ class UserModel(db.Model):
         return f"otpauth://totp/{self.email}?secret={self.otp_secret}&issuer=Flask"
     
     def verify_totp(self, token):
-        return onetimepass.valid_totp(token, self.otp_secret)
+        return valid_totp(token, self.otp_secret)
 
     def check_password(self, password):
-        return check_password_hash(self.password, password)
+        password = encryption.hash_password(password, self.salt)
+        if self.password != password:
+            return False
+        return True
 
     def save_to_db(self):
         self.updated_at = datetime.datetime.utcnow()
+        self.name_hash = encryption.hash_data(self.name)
+        self.name = encryption.encrypt_data(self.name)
+        self.email_hash = encryption.hash_data(self.email)
+        self.email = encryption.encrypt_data(self.email)
         db.session.add(self)
         db.session.commit()
 
@@ -69,7 +88,10 @@ class UserModel(db.Model):
 
     @classmethod
     def find_by_id(cls, id):
-        return cls.query.filter_by(id=id, is_active=True).first()
+        user = cls.query.filter_by(id=id, is_active=True).first()        
+        user.name = encryption.decrypt_data(str(user.name))
+        user.email = encryption.decrypt_data(str(user.email))
+        return user
 
     @staticmethod
     def is_valid_email(email):

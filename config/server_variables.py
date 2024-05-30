@@ -1,23 +1,27 @@
 from dotenv import load_dotenv
-import os
+from os import environ
 
 load_dotenv()
 
 # Flask Environment Variables
-SERVER_HOST = os.environ["HOST"]
-SERVER_PORT = os.environ["PORT"]
-SERVER_ENV = os.environ["ENV"]
-SECRET_KEY = os.environ["SECRET_KEY"]
-JWT_SECRET_KEY = os.environ["JWT_SECRET_KEY"]
+SERVER_HOST = environ.get("HOST")
+SERVER_PORT = environ.get("PORT")
+SERVER_ENV = environ.get("ENV")
+SECRET_KEY = environ.get("SECRET_KEY")
+JWT_SECRET_KEY = environ.get("JWT_SECRET_KEY")
 
 # MySQL Environment Variables
-MYSQL_USER = os.environ["MYSQL_USER"]
-MYSQL_PASSWORD = os.environ["MYSQL_PASSWORD"]
-MYSQL_HOST = os.environ["MYSQL_HOST"]
-MYSQL_PORT = os.environ["MYSQL_PORT"]
-MYSQL_DB = os.environ["MYSQL_DB_NAME"]
-
-# SSL_NAME = os.environ["SSL_NAME"]
-
-
+MYSQL_USER = environ.get("MYSQL_USER")
+MYSQL_PASSWORD = environ.get("MYSQL_PASSWORD")
+MYSQL_HOST = environ.get("MYSQL_HOST")
+MYSQL_PORT = environ.get("MYSQL_PORT")
+MYSQL_DB = environ.get("MYSQL_DB_NAME")
+# MYSQL_SECRET_KEY = environ.get("MYSQL_SECRET_KEY")
 DATABASE_CONNECTION_URI = f"mysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
+
+# For production environment only
+SSL_NAME = environ.get("SSL_NAME")
+if SSL_NAME:
+  DATABASE_CONNECTION_URI += f"?ssl_ca={SSL_NAME}.crt.pem"
+
+
