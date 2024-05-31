@@ -232,3 +232,31 @@ class User2FA(Resource):
             return {"message": "User not found"}, 404
 
         return {"uri": user.get_totp_uri()}, 200
+    
+class ChangePassword(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+        "email", type=str, required=True, help="This field cannot be blank."
+    )
+    parser.add_argument(
+        "password", type=str, required=True, help="This field cannot be blank."
+    )
+    def post(self):
+        data = ChangePassword.parser.parse_args()
+
+        user_email = UserModel.query.filter_by(email=data["email"], is_active=True).one_or_none()
+
+        if user_email is None:
+            return {"message": "User with that email does not exist or is not active"}, 404
+
+
+        if data["password"] == "" or len(data["password"]) < 8:
+            return {"message": "Password must be at least 8 characters"}, 400
+
+        user_email.password = generate_password_hash(data["password"], method="pbkdf2")
+
+        try:
+            user_email.save_to_db()
+            return {"message": "Password updated successfully"}, 200
+        except:
+            return {"message": "An error occurred updating the user."}, 500

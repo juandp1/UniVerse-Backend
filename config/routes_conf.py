@@ -8,6 +8,7 @@ from routes.responses import add_resources as add_responses_resources
 from routes.statistics import add_resources as add_statistics_resources
 from routes.topic import add_resources as add_topic_resources
 from routes.user import add_resources as add_user_resources
+from routes.recovers import add_resources as add_recovers_resources
 
 
 
@@ -22,3 +23,4 @@ def start_routes(api):
     add_statistics_resources(api)
     add_topic_resources(api)
     add_user_resources(api)
+    add_recovers_resources(api)
